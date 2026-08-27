@@ -10,17 +10,24 @@ import com.questionnaire.core.model.Client;
 import com.questionnaire.core.utils.ConfigLoader;
 import com.questionnaire.core.utils.MyEchoBot;
 
+import lombok.Getter;
+
 public class TelegramCom {
     private ClientManager clientManager;
     private BlockingQueue<Update> queue;
     private MyEchoBot myEchoBot;
     private String botToken;
 
+    @Getter
+    private BlockingQueue<Client> newClientQueue;
+
     public TelegramCom() {
         this.clientManager = new ClientManager();
-        this.queue = new ArrayBlockingQueue<>(100);
         this.botToken = ConfigLoader.getBotToken();
-        this.myEchoBot = new MyEchoBot(this.botToken, this.queue);
+        this.myEchoBot = new MyEchoBot(this.botToken);
+        this.queue = this.myEchoBot.getIncomeQueue();
+
+        this.newClientQueue = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
 
         this.initCom();
     }
@@ -59,7 +66,6 @@ public class TelegramCom {
             }
 
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -80,13 +86,14 @@ public class TelegramCom {
                     client.getFullName() + " joined and now we have " + this.clientManager.getClientsCount(),
                     client);
 
-            Constants.newUserLock.notify();
+            // update gui
+            this.newClientQueue.add(client);
         }
         this.myEchoBot.sendMessage(chatId, response);
     }
 
-    private boolean sendMessage(long chatId, String msg) {
-        return this.myEchoBot.sendMessage(chatId, msg);
+    private void sendMessage(long chatId, String msg) {
+        this.myEchoBot.sendMessage(chatId, msg);
     }
 
     private void broadcastExcept(String msg, Client excludedClient) {
