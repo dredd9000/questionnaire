@@ -1,29 +1,37 @@
 package com.questionnaire.core.model;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import lombok.Data;
+import com.questionnaire.core.Constants;
 
-@Data
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
 public class Question {
-    private static final int INIT_ANSWER_COUNTER = 0;
+    private static AtomicInteger nextId = new AtomicInteger(0);
 
     private String question;
-    private Map<String, Integer> answers; // answer, counter
-    private Set<Client> answeredBy;
+    private List<String> answers; // answers
+    private Map<Client, Integer> answeredBy; // what client, what answer by index of answer
+    private int questionId;
 
     public Question(String question, List<String> answers) {
+        this.questionId = nextId.incrementAndGet();
         this.question = question;
 
-        this.answeredBy = new HashSet<>();
+        this.answeredBy = new HashMap<>();
+        this.answers = new ArrayList<>();
 
         int i = 1;
         for (String answer : answers) {
-            this.answers.put(answer, INIT_ANSWER_COUNTER);
-            if (++i == 5) {
+            this.answers.add(answer);
+            if (++i == Constants.MAX_ANSWERS) {
                 break;
             }
         }
