@@ -8,4 +8,8 @@ public class Constants {
     public static final int MAX_QUEUE_VALUE = 100;
 
     public static final int SEND_SLEEP_DELAY = 35;
+
+    public static final int MIN_ANSWERS = 2;
+    public static final int MAX_ANSWERS = 4;
+    public static final int MAX_QUESTIONS = 3;
 }
