@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import com.questionnaire.Utils;
 import com.questionnaire.core.model.Client;
 import com.questionnaire.core.utils.ConfigLoader;
 import com.questionnaire.core.utils.MyEchoBot;
@@ -75,10 +76,12 @@ public class TelegramCom {
 
     private void broadcastExcept(String msg, Client excludedClient) {
         for (Client client : this.clientManager.getClientsList()) {
-            if (client.equals(excludedClient)) {
+            if (excludedClient != null && client.equals(excludedClient)) {
                 continue;
             }
             this.myEchoBot.sendMessage(client.getChatId(), msg);
+
+            Utils.sleep(Constants.SEND_SLEEP_DELAY);
         }
     }
 }
