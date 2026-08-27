@@ -2,7 +2,6 @@ package com.questionnaire.core;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -13,60 +12,41 @@ import com.questionnaire.core.utils.MyEchoBot;
 import lombok.Getter;
 
 public class TelegramCom {
-    private ClientManager clientManager;
-    private BlockingQueue<Update> queue;
-    private MyEchoBot myEchoBot;
-    private String botToken;
+    private final ClientManager clientManager;
+    private final MyEchoBot myEchoBot;
+    private final TelegramBotsLongPollingApplication botsApplication;
 
     @Getter
-    private BlockingQueue<Client> newClientQueue;
+    private final BlockingQueue<Client> newClientQueue;
 
     public TelegramCom() {
         this.clientManager = new ClientManager();
-        this.botToken = ConfigLoader.getBotToken();
-        this.myEchoBot = new MyEchoBot(this.botToken);
-        this.queue = this.myEchoBot.getIncomeQueue();
-
         this.newClientQueue = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
 
-        this.initCom();
+        String botToken = ConfigLoader.getBotToken();
+
+        // Pass function handle directly into MyEchoBot
+        this.myEchoBot = new MyEchoBot(botToken, this::handleUpdate);
+        this.botsApplication = new TelegramBotsLongPollingApplication();
+
+        this.startBot(botToken);
     }
 
-    private void initCom() {
-
-        try (TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()) {
+    private void startBot(String botToken) {
+        try {
             botsApplication.registerBot(botToken, this.myEchoBot);
             System.out.println("Bot started!");
-
-            this.msgQueueThread();
-
-            Thread.currentThread().join();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void msgQueueThread() {
-        new Thread(() -> {
-            while (true) {
-                handleMsgQueueThread();
-            }
-        }).start();
-    }
+    // Handled synchronously when an update arrives
+    private void handleUpdate(Update update) {
+        String msg = update.getMessage().getText();
 
-    private synchronized void handleMsgQueueThread() {
-        try {
-            Update update = this.queue.take();
-
-            String msg = update.getMessage().getText();
-
-            if (this.isJoinMsg(msg)) {
-                // the user wants to join
-                this.handleNewUserJoining(update);
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (isJoinMsg(msg)) {
+            handleNewUserJoining(update);
         }
     }
 
@@ -86,14 +66,11 @@ public class TelegramCom {
                     client.getFullName() + " joined and now we have " + this.clientManager.getClientsCount(),
                     client);
 
-            // update gui
+            // Notify GUI queue
             this.newClientQueue.add(client);
         }
-        this.myEchoBot.sendMessage(chatId, response);
-    }
 
-    private void sendMessage(long chatId, String msg) {
-        this.myEchoBot.sendMessage(chatId, msg);
+        this.myEchoBot.sendMessage(chatId, response);
     }
 
     private void broadcastExcept(String msg, Client excludedClient) {
@@ -101,8 +78,7 @@ public class TelegramCom {
             if (client.equals(excludedClient)) {
                 continue;
             }
-
-            this.sendMessage(client.getChatId(), msg);
+            this.myEchoBot.sendMessage(client.getChatId(), msg);
         }
     }
 }
