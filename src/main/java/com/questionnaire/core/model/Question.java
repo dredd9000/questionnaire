@@ -36,4 +36,34 @@ public class Question {
             }
         }
     }
+
+    public boolean isMyQuestionId(int questionId) {
+        return this.questionId == questionId;
+    }
+
+    public boolean isMyAnswer(int answerIdx) {
+        return this.answers.size() > answerIdx;
+    }
+
+    public boolean didIAlreadyAnswered(Client client) {
+        return this.answeredBy.get(client) != null;
+    }
+
+    public String answer(int questionId, int answerIdx, Client client) {
+        if (!this.isMyQuestionId(questionId)) {
+            return Constants.INVALID_QUESTION;
+        }
+
+        if (!this.isMyAnswer(answerIdx)) {
+            return Constants.INVALID_ANSWER;
+        }
+
+        if (this.didIAlreadyAnswered(client)) {
+            return Constants.YOU_ALREADY_ANSWERED_TO_THIS_QUESTION;
+        }
+
+        this.answeredBy.put(client, answerIdx);
+
+        return Constants.THANK_YOU;
+    }
 }

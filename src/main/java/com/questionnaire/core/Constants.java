@@ -12,4 +12,14 @@ public class Constants {
     public static final int MIN_ANSWERS = 2;
     public static final int MAX_ANSWERS = 4;
     public static final int MAX_QUESTIONS = 3;
+
+    public static final String ANSWER_DELIMITER = ":";
+
+    /*  */
+    public static final String INVALID_RESPONSE = "Invalid response";
+    public static final String INVALID_QUESTION = "Invalid question";
+    public static final String INVALID_ANSWER = "Invalid answer";
+    public static final String YOU_ALREADY_ANSWERED_TO_THIS_QUESTION = "You already answered to this question";
+    public static final String THANK_YOU = "Thank you";
+
 }

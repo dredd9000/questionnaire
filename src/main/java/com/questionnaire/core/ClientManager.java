@@ -17,6 +17,10 @@ public class ClientManager {
         return (this.clients.putIfAbsent(client.getClientId(), client) == null);
     }
 
+    public Client getClientById(long clientId) {
+        return this.clients.get(clientId);
+    }
+
     public long getClientsCount() {
         return this.clients.size();
     }

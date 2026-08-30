@@ -6,6 +6,7 @@ import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import com.questionnaire.Utils;
+import com.questionnaire.core.model.Answer;
 import com.questionnaire.core.model.Client;
 import com.questionnaire.core.utils.ConfigLoader;
 import com.questionnaire.core.utils.MyEchoBot;
@@ -16,19 +17,25 @@ public class TelegramCom {
     private final ClientManager clientManager;
     private final MyEchoBot myEchoBot;
     private final TelegramBotsLongPollingApplication botsApplication;
+    private final Survey survey;
 
     @Getter
     private final BlockingQueue<Client> newClientQueue;
+    private final BlockingQueue<Answer> newAnswer;
 
     public TelegramCom() {
         this.clientManager = new ClientManager();
         this.newClientQueue = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
+        this.newAnswer = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
 
         String botToken = ConfigLoader.getBotToken();
 
         // Pass function handle directly into MyEchoBot
-        this.myEchoBot = new MyEchoBot(botToken, this::handleUpdate);
         this.botsApplication = new TelegramBotsLongPollingApplication();
+
+        this.survey = new Survey(this.clientManager, this.newAnswer);
+
+        this.myEchoBot = new MyEchoBot(botToken, this::handleUpdate, this.survey::recordAnswer);
 
         this.startBot(botToken);
     }

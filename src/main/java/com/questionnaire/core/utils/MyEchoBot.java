@@ -15,16 +15,19 @@ import com.questionnaire.core.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class MyEchoBot implements LongPollingUpdateConsumer {
 
     private final TelegramClient telegramClient;
     private final Consumer<Update> updateHandler;
+    private final BiFunction<Long, String, String> answerHandler;
 
-    public MyEchoBot(String botToken, Consumer<Update> updateHandler) {
+    public MyEchoBot(String botToken, Consumer<Update> updateHandler, BiFunction<Long, String, String> answerHandler) {
         this.telegramClient = new OkHttpTelegramClient(botToken);
         this.updateHandler = updateHandler;
+        this.answerHandler = answerHandler;
     }
 
     @Override
@@ -52,10 +55,12 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
         // Process the selected answer
         System.out.println("User in chat " + chatId + " clicked: " + clickedOption);
 
+        String response = this.answerHandler.apply(update.getMessage().getFrom().getId(), clickedOption);
+
         // Stop the loading spinner on the user's button (and show optional alert)
         AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
                 .callbackQueryId(callbackId)
-                .text("Option recorded!") // Pop-up banner text
+                .text(response) // Pop-up banner text
                 .showAlert(false) // Set to true for a modal popup box
                 .build();
 
