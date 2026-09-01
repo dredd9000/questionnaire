@@ -80,7 +80,7 @@ public class TelegramCom {
             this.newClientQueue.add(client);
         }
 
-        this.myEchoBot.sendMessage(chatId, response);
+        this.myEchoBot.addMessageToQueue(chatId, response);
     }
 
     private void broadcastQuestionToGroup(Collection<Client> group, Question question) {
@@ -107,9 +107,9 @@ public class TelegramCom {
             }
 
             if (msg instanceof String) {
-                this.myEchoBot.sendMessage(client.getChatId(), (String) msg);
+                this.myEchoBot.addMessageToQueue(client.getChatId(), (String) msg);
             } else if (msg instanceof Question) {
-                this.myEchoBot.sendQuestion(client.getChatId(), (Question) msg);
+                this.myEchoBot.addQueestionToQueue(client.getChatId(), (Question) msg);
             }
 
             Utils.sleep(Constants.SEND_SLEEP_DELAY);

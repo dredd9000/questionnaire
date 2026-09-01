@@ -11,10 +11,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import com.questionnaire.core.Constants;
 import com.questionnaire.core.model.Question;
+import com.questionnaire.core.model.SendToTlgrm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -23,11 +27,15 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
     private final TelegramClient telegramClient;
     private final Consumer<Update> updateHandler;
     private final BiFunction<Long, String, String> answerHandler;
+    private final BlockingQueue<SendToTlgrm> outcome;
 
     public MyEchoBot(String botToken, Consumer<Update> updateHandler, BiFunction<Long, String, String> answerHandler) {
         this.telegramClient = new OkHttpTelegramClient(botToken);
         this.updateHandler = updateHandler;
         this.answerHandler = answerHandler;
+        this.outcome = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
+
+        this.outcomeThread();
     }
 
     @Override
@@ -72,7 +80,33 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
         }
     }
 
-    public boolean sendMessage(long chatId, String text) {
+    private void outcomeThread() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    SendToTlgrm obj = this.outcome.take();
+                    if (obj.getData() instanceof String) {
+                        this.sendMessage(obj.getChatId(), (String) obj.getData());
+                    }
+                    if (obj.getData() instanceof Question) {
+                        this.sendQuestion(obj.getChatId(), (Question) obj.getData());
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void addMessageToQueue(long chatId, String text) {
+        this.outcome.add(new SendToTlgrm(chatId, text));
+    }
+
+    public void addQueestionToQueue(long chatId, Question question) {
+        this.outcome.add(new SendToTlgrm(chatId, question));
+    }
+
+    private boolean sendMessage(long chatId, String text) {
         SendMessage msg = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
@@ -86,7 +120,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
         }
     }
 
-    public boolean sendQuestion(long chatId, Question question) {
+    private boolean sendQuestion(long chatId, Question question) {
 
         if (question == null || question.getAnswers() == null ||
                 question.getAnswers().isEmpty()) {
