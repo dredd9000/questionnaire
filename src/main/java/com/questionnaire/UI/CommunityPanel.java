@@ -86,12 +86,7 @@ public class CommunityPanel extends JPanel {
         // Swing components MUST be updated on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
             this.tableModel.addRow(new Object[] { name, telegramUsername, joinedAt });
-        });
-    }
-
-    public void setTotalCommunityMembersNumber(int num) {
-        SwingUtilities.invokeLater(() -> {
-            this.totalMembersLabel.setText(num + "");
+            this.totalMembersLabel.setText(this.telegramCom.getClientsCount() + "");
         });
     }
 
