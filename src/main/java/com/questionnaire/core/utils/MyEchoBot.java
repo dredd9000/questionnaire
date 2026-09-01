@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import com.questionnaire.Globals;
 import com.questionnaire.core.Constants;
 import com.questionnaire.core.model.Question;
 import com.questionnaire.core.model.SendToTlgrm;
@@ -92,12 +93,15 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             while (true) {
                 try {
                     SendToTlgrm obj = this.outcome.take();
+
                     if (obj.getData() instanceof String) {
                         this.sendMessage(obj.getChatId(), (String) obj.getData());
                     }
+
                     if (obj.getData() instanceof Question) {
                         this.sendQuestion(obj.getChatId(), (Question) obj.getData());
                     }
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -109,7 +113,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
         this.outcome.add(new SendToTlgrm(chatId, text));
     }
 
-    public void addQueestionToQueue(long chatId, Question question) {
+    public void addQuestionToQueue(long chatId, Question question) {
         this.outcome.add(new SendToTlgrm(chatId, question));
     }
 
@@ -122,6 +126,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             telegramClient.execute(msg);
             return true;
         } catch (TelegramApiException e) {
+            Globals.generalMsgs.add(Constants.SOMETHING_WENT_WRONG);
             e.printStackTrace();
             return false;
         }
@@ -169,6 +174,9 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
         } catch (TelegramApiException e) {
             System.err.println("Failed to send question to chat " + chatId + ": " +
                     e.getMessage());
+
+            Globals.generalMsgs.add(Constants.SOMETHING_WENT_WRONG);
+
             return false;
         }
     }

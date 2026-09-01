@@ -35,7 +35,7 @@ public class TelegramCom {
         // Pass function handle directly into MyEchoBot
         this.botsApplication = new TelegramBotsLongPollingApplication();
 
-        this.survey = new Survey(this.clientManager, this.newAnswer);
+        this.survey = new Survey(this.clientManager, this.newAnswer, this::broadcastQuestionToGroup);
 
         this.myEchoBot = new MyEchoBot(botToken, this::handleUpdate, this.survey::recordAnswer);
 
@@ -87,9 +87,9 @@ public class TelegramCom {
         this.broadcastExceptToGroup(group, question, null);
     }
 
-    private void broadcast(String msg) {
-        this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, null);
-    }
+    // private void broadcast(String msg) {
+    // this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, null);
+    // }
 
     private void broadcastExcept(String msg, Client excludedClient) {
         this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, excludedClient);
@@ -109,7 +109,7 @@ public class TelegramCom {
             if (msg instanceof String) {
                 this.myEchoBot.addMessageToQueue(client.getChatId(), (String) msg);
             } else if (msg instanceof Question) {
-                this.myEchoBot.addQueestionToQueue(client.getChatId(), (Question) msg);
+                this.myEchoBot.addQuestionToQueue(client.getChatId(), (Question) msg);
             }
 
             Utils.sleep(Constants.SEND_SLEEP_DELAY);

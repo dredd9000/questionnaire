@@ -1,9 +1,11 @@
 package com.questionnaire.core;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.function.BiConsumer;
 
 import com.questionnaire.core.enums.ESurveyStatus;
 import com.questionnaire.core.model.Answer;
@@ -19,11 +21,18 @@ public class Survey {
     private ESurveyStatus status;
     private ClientManager clientManager;
     private final BlockingQueue<Answer> newAnswer;
+    private final BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup;
 
-    public Survey(ClientManager clientManager, BlockingQueue<Answer> newAnswer) {
+    public Survey(ClientManager clientManager,
+            BlockingQueue<Answer> newAnswer,
+            BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup) {
         this.status = ESurveyStatus.PRE;
-        this.clientManager = clientManager;
+
         this.group = new HashSet<>();
+
+        this.clientManager = clientManager;
+
+        this.broadcastQuestionToGroup = broadcastQuestionToGroup;
 
         this.newAnswer = newAnswer;
     }
@@ -32,6 +41,10 @@ public class Survey {
         this.status = ESurveyStatus.STARTED;
         this.questions = questions;
         this.createGroup();
+
+        for (Question question : questions) {
+            this.broadcastQuestionToGroup.accept(this.group, question);
+        }
     }
 
     private void createGroup() {
