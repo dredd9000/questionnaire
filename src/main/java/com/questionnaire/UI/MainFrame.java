@@ -2,7 +2,6 @@ package com.questionnaire.UI;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 
 public class MainFrame {
     private JFrame frame;
@@ -34,7 +33,7 @@ public class MainFrame {
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.communityPanel, this.createPollPanel);
 
-        splitPane.setResizeWeight(0.35);
+        splitPane.setResizeWeight(Constants.PANELS_SPLIT_RATIO);
         splitPane.setContinuousLayout(true);
 
         this.frame.add(splitPane);
