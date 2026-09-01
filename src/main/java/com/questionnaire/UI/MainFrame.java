@@ -4,9 +4,14 @@ import javax.swing.JFrame;
 
 public class MainFrame {
     private JFrame frame;
+    private CommunityPanel communityPanel;
 
     public MainFrame() {
         this.initFrame();
+
+        this.initCommunityPanel();
+
+        this.frame.setVisible(true);
     }
 
     private void initFrame() {
@@ -18,6 +23,11 @@ public class MainFrame {
 
         this.frame.setLocationRelativeTo(null);
 
-        this.frame.setVisible(true);
+    }
+
+    private void initCommunityPanel() {
+        this.communityPanel = new CommunityPanel();
+
+        this.frame.add(this.communityPanel);
     }
 }
