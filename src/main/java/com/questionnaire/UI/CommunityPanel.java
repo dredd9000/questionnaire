@@ -29,7 +29,7 @@ public class CommunityPanel extends JPanel {
 
     private JPanel createStatsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
-        panel.setBorder(BorderFactory.createTitledBorder(Constants.COMMUNITY_OVERVIEW));
+        panel.setBorder(BorderFactory.createTitledBorder(UIConstants.COMMUNITY_OVERVIEW));
 
         JLabel totalLabel = new JLabel("Total Members: ");
 

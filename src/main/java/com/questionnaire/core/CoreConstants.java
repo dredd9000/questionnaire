@@ -2,7 +2,7 @@ package com.questionnaire.core;
 
 import java.util.List;
 
-public class Constants {
+public class CoreConstants {
     public static final List<String> JOIN_KEYWORDS = List.of("/start", "hi", "היי");
 
     public static final int MAX_QUEUE_VALUE = 100;
@@ -12,6 +12,8 @@ public class Constants {
     public static final int MIN_ANSWERS = 2;
     public static final int MAX_ANSWERS = 4;
     public static final int MAX_QUESTIONS = 3;
+
+    public static final int MIN_CLIENTS = 3;
 
     public static final String ANSWER_DELIMITER = ":";
 

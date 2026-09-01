@@ -17,9 +17,9 @@ public class MainFrame {
     }
 
     private void initFrame() {
-        this.frame = new JFrame(Constants.WINDOW_TITLE);
+        this.frame = new JFrame(UIConstants.WINDOW_TITLE);
 
-        this.frame.setSize(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+        this.frame.setSize(UIConstants.WINDOW_WIDTH, UIConstants.WINDOW_HEIGHT);
 
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -33,7 +33,7 @@ public class MainFrame {
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.communityPanel, this.createPollPanel);
 
-        splitPane.setResizeWeight(Constants.PANELS_SPLIT_RATIO);
+        splitPane.setResizeWeight(UIConstants.PANELS_SPLIT_RATIO);
         splitPane.setContinuousLayout(true);
 
         this.frame.add(splitPane);

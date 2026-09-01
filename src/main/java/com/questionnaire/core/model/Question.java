@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.questionnaire.core.Constants;
+import com.questionnaire.core.CoreConstants;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -31,7 +31,7 @@ public class Question {
         int i = 1;
         for (String answer : answers) {
             this.answers.add(answer);
-            if (++i == Constants.MAX_ANSWERS) {
+            if (++i == CoreConstants.MAX_ANSWERS) {
                 break;
             }
         }
@@ -51,19 +51,19 @@ public class Question {
 
     public String answer(int questionId, int answerIdx, Client client) {
         if (!this.isMyQuestionId(questionId)) {
-            return Constants.INVALID_QUESTION;
+            return CoreConstants.INVALID_QUESTION;
         }
 
         if (!this.isMyAnswer(answerIdx)) {
-            return Constants.INVALID_ANSWER;
+            return CoreConstants.INVALID_ANSWER;
         }
 
         if (this.didIAlreadyAnswered(client)) {
-            return Constants.YOU_ALREADY_ANSWERED_TO_THIS_QUESTION;
+            return CoreConstants.YOU_ALREADY_ANSWERED_TO_THIS_QUESTION;
         }
 
         this.answeredBy.put(client, answerIdx);
 
-        return Constants.THANK_YOU;
+        return CoreConstants.THANK_YOU;
     }
 }

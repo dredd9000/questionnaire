@@ -1,6 +1,6 @@
 package com.questionnaire.UI;
 
-public class Constants {
+public class UIConstants {
     public static final int WINDOW_WIDTH = 1300;
     public static final int WINDOW_HEIGHT = 768;
 

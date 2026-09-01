@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.questionnaire.Globals;
-import com.questionnaire.core.Constants;
+import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.model.Question;
 import com.questionnaire.core.model.SendToTlgrm;
 
@@ -34,7 +34,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
         this.telegramClient = new OkHttpTelegramClient(botToken);
         this.updateHandler = updateHandler;
         this.answerHandler = answerHandler;
-        this.outcome = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
+        this.outcome = new ArrayBlockingQueue<>(CoreConstants.MAX_QUEUE_VALUE);
 
         this.outcomeThread();
     }
@@ -126,7 +126,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             telegramClient.execute(msg);
             return true;
         } catch (TelegramApiException e) {
-            Globals.generalMsgs.add(Constants.SOMETHING_WENT_WRONG);
+            Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
             e.printStackTrace();
             return false;
         }
@@ -175,7 +175,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             System.err.println("Failed to send question to chat " + chatId + ": " +
                     e.getMessage());
 
-            Globals.generalMsgs.add(Constants.SOMETHING_WENT_WRONG);
+            Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
 
             return false;
         }

@@ -15,6 +15,9 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+
+import com.questionnaire.core.CoreConstants;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -120,7 +123,7 @@ public class CreatePollPanel extends JPanel {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(questionsContainer, BorderLayout.NORTH);
 
-        addQuestionBtn = new JButton("+ Add Question (Max 3)");
+        addQuestionBtn = new JButton("+ Add Question (Max " + CoreConstants.MAX_QUESTIONS + ")");
         addQuestionBtn.addActionListener(e -> addQuestionBlock());
         wrapper.add(addQuestionBtn, BorderLayout.SOUTH);
 
@@ -128,7 +131,7 @@ public class CreatePollPanel extends JPanel {
     }
 
     private void addQuestionBlock() {
-        if (questionBlocks.size() >= 3)
+        if (questionBlocks.size() >= CoreConstants.MAX_QUESTIONS)
             return;
 
         int questionNum = questionBlocks.size() + 1;
@@ -159,7 +162,7 @@ public class CreatePollPanel extends JPanel {
     }
 
     private void updateQuestionControls() {
-        addQuestionBtn.setEnabled(questionBlocks.size() < 3);
+        addQuestionBtn.setEnabled(questionBlocks.size() < CoreConstants.MAX_QUESTIONS);
         for (int i = 0; i < questionBlocks.size(); i++) {
             questionBlocks.get(i).setDeleteEnabled(questionBlocks.size() > 1 && i == questionBlocks.size() - 1);
         }
@@ -224,10 +227,11 @@ public class CreatePollPanel extends JPanel {
             launchPollBtn.setEnabled(false);
             statusBannerLabel.setText("⚠️ A poll is currently active. Only one active poll is allowed.");
             statusBannerLabel.setForeground(Color.RED);
-        } else if (communitySize < 3) {
+        } else if (communitySize < CoreConstants.MAX_QUESTIONS) {
             launchPollBtn.setEnabled(false);
             statusBannerLabel
-                    .setText("⚠️ Cannot launch poll: Minimum 3 members required (Current: " + communitySize + ")");
+                    .setText("⚠️ Cannot launch poll: Minimum " + CoreConstants.MIN_CLIENTS
+                            + " members required (Current: " + communitySize + ")");
             statusBannerLabel.setForeground(Color.ORANGE.darker());
         } else {
             launchPollBtn.setEnabled(true);
@@ -267,7 +271,7 @@ public class CreatePollPanel extends JPanel {
             optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
             add(optionsPanel, BorderLayout.CENTER);
 
-            addOptionBtn = new JButton("+ Add Choice (Max 4)");
+            addOptionBtn = new JButton("+ Add Choice (Max " + CoreConstants.MAX_ANSWERS + ")");
             addOptionBtn.addActionListener(e -> addOptionField());
 
             JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -275,8 +279,9 @@ public class CreatePollPanel extends JPanel {
             add(bottom, BorderLayout.SOUTH);
 
             // Default: 2 minimum options required
-            addOptionField();
-            addOptionField();
+            for (int i = 0; i < CoreConstants.MIN_ANSWERS; i++) {
+                addOptionField();
+            }
         }
 
         public void setQuestionNumber(int number) {
@@ -288,7 +293,7 @@ public class CreatePollPanel extends JPanel {
         }
 
         private void addOptionField() {
-            if (optionFields.size() >= 4)
+            if (optionFields.size() >= CoreConstants.MAX_ANSWERS)
                 return;
 
             int optNum = optionFields.size() + 1;
@@ -301,7 +306,7 @@ public class CreatePollPanel extends JPanel {
             optRow.add(optField, BorderLayout.CENTER);
 
             optionsPanel.add(optRow);
-            addOptionBtn.setEnabled(optionFields.size() < 4);
+            addOptionBtn.setEnabled(optionFields.size() < CoreConstants.MAX_ANSWERS);
 
             revalidate();
             repaint();

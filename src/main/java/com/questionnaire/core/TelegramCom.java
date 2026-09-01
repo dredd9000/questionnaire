@@ -27,8 +27,8 @@ public class TelegramCom {
 
     public TelegramCom() {
         this.clientManager = new ClientManager();
-        this.newClientQueue = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
-        this.newAnswer = new ArrayBlockingQueue<>(Constants.MAX_QUEUE_VALUE);
+        this.newClientQueue = new ArrayBlockingQueue<>(CoreConstants.MAX_QUEUE_VALUE);
+        this.newAnswer = new ArrayBlockingQueue<>(CoreConstants.MAX_QUEUE_VALUE);
 
         String botToken = ConfigLoader.getBotToken();
 
@@ -61,7 +61,7 @@ public class TelegramCom {
     }
 
     private boolean isJoinMsg(String msg) {
-        return Constants.JOIN_KEYWORDS.contains(msg);
+        return CoreConstants.JOIN_KEYWORDS.contains(msg);
     }
 
     private void handleNewUserJoining(Update update) {
@@ -112,7 +112,7 @@ public class TelegramCom {
                 this.myEchoBot.addQuestionToQueue(client.getChatId(), (Question) msg);
             }
 
-            Utils.sleep(Constants.SEND_SLEEP_DELAY);
+            Utils.sleep(CoreConstants.SEND_SLEEP_DELAY);
         }
     }
 }

@@ -65,21 +65,21 @@ public class Survey {
     }
 
     public String recordAnswer(long clientId, String res) {
-        String[] arr = res.split(Constants.ANSWER_DELIMITER);
+        String[] arr = res.split(CoreConstants.ANSWER_DELIMITER);
 
         if (arr.length != 2) {
-            return Constants.INVALID_RESPONSE;
+            return CoreConstants.INVALID_RESPONSE;
         }
 
         int questionIdx = Integer.parseInt(arr[0]);
         int answerIdx = Integer.parseInt(arr[1]);
 
         if (this.questions == null) {
-            return Constants.SOMETHING_WENT_WRONG;
+            return CoreConstants.SOMETHING_WENT_WRONG;
         }
 
         if (questionIdx >= this.questions.size()) {
-            return Constants.INVALID_QUESTION;
+            return CoreConstants.INVALID_QUESTION;
         }
 
         Question question = this.questions.get(questionIdx);
@@ -88,7 +88,7 @@ public class Survey {
 
         String answerResponse = question.answer(questionIdx, answerIdx, client);
 
-        if (answerResponse.equals(Constants.THANK_YOU)) {
+        if (answerResponse.equals(CoreConstants.THANK_YOU)) {
             this.newAnswer.add(new Answer(client, question, answerIdx));
         }
 
