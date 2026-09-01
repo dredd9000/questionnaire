@@ -1,5 +1,6 @@
 package com.questionnaire.core;
 
+import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
@@ -8,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import com.questionnaire.Utils;
 import com.questionnaire.core.model.Answer;
 import com.questionnaire.core.model.Client;
+import com.questionnaire.core.model.Question;
 import com.questionnaire.core.utils.ConfigLoader;
 import com.questionnaire.core.utils.MyEchoBot;
 
@@ -81,12 +83,34 @@ public class TelegramCom {
         this.myEchoBot.sendMessage(chatId, response);
     }
 
+    private void broadcastQuestionToGroup(Collection<Client> group, Question question) {
+        this.broadcastExceptToGroup(group, question, null);
+    }
+
+    private void broadcast(String msg) {
+        this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, null);
+    }
+
     private void broadcastExcept(String msg, Client excludedClient) {
-        for (Client client : this.clientManager.getClientsList()) {
+        this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, excludedClient);
+    }
+
+    private void broadcastExceptToGroup(Collection<Client> to, Object msg, Client excludedClient) {
+        if (!(msg instanceof String || msg instanceof Question)) {
+            System.out.println("Invalid msg, msg must be of type String or Question");
+            return;
+        }
+
+        for (Client client : to) {
             if (excludedClient != null && client.equals(excludedClient)) {
                 continue;
             }
-            this.myEchoBot.sendMessage(client.getChatId(), msg);
+
+            if (msg instanceof String) {
+                this.myEchoBot.sendMessage(client.getChatId(), (String) msg);
+            } else if (msg instanceof Question) {
+                this.myEchoBot.sendQuestion(client.getChatId(), (Question) msg);
+            }
 
             Utils.sleep(Constants.SEND_SLEEP_DELAY);
         }
