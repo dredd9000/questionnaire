@@ -1,15 +1,18 @@
 package com.questionnaire.UI;
 
 import javax.swing.JFrame;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 
 public class MainFrame {
     private JFrame frame;
     private CommunityPanel communityPanel;
+    private CreatePollPanel createPollPanel;
 
     public MainFrame() {
         this.initFrame();
 
-        this.initCommunityPanel();
+        this.initPanelsAndTabs();
 
         this.frame.setVisible(true);
     }
@@ -25,9 +28,15 @@ public class MainFrame {
 
     }
 
-    private void initCommunityPanel() {
+    private void initPanelsAndTabs() {
         this.communityPanel = new CommunityPanel();
+        this.createPollPanel = new CreatePollPanel();
 
-        this.frame.add(this.communityPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.communityPanel, this.createPollPanel);
+
+        splitPane.setResizeWeight(0.35);
+        splitPane.setContinuousLayout(true);
+
+        this.frame.add(splitPane);
     }
 }
