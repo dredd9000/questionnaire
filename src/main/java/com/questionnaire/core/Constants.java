@@ -16,6 +16,7 @@ public class Constants {
     public static final String ANSWER_DELIMITER = ":";
 
     /*  */
+    public static final String SOMETHING_WENT_WRONG = "something went wrong";
     public static final String INVALID_RESPONSE = "Invalid response";
     public static final String INVALID_QUESTION = "Invalid question";
     public static final String INVALID_ANSWER = "Invalid answer";

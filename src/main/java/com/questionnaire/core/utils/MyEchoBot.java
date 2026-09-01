@@ -56,24 +56,31 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
     }
 
     private void handleButtonClick(Update update) {
-        String callbackId = update.getCallbackQuery().getId();
-        String clickedOption = update.getCallbackQuery().getData(); // E.g., "OPT_1"
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
-
-        // Process the selected answer
-        System.out.println("User in chat " + chatId + " clicked: " + clickedOption);
-
-        String response = this.answerHandler.apply(update.getMessage().getFrom().getId(), clickedOption);
-
-        // Stop the loading spinner on the user's button (and show optional alert)
-        AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
-                .callbackQueryId(callbackId)
-                .text(response) // Pop-up banner text
-                .showAlert(false) // Set to true for a modal popup box
-                .build();
-
         try {
+            String callbackId = update.getCallbackQuery().getId();
+            String clickedOption = update.getCallbackQuery().getData(); // E.g., "OPT_1"
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+
+            // Process the selected answer
+            System.out.println("User in chat " + chatId + " clicked: " + clickedOption);
+
+            long clientId;
+            if (update.getMessage() == null) {
+                clientId = update.getCallbackQuery().getFrom().getId();
+            } else {
+                clientId = update.getMessage().getFrom().getId();
+            }
+            String response = this.answerHandler.apply(clientId, clickedOption);
+
+            // Stop the loading spinner on the user's button (and show optional alert)
+            AnswerCallbackQuery answer = AnswerCallbackQuery.builder()
+                    .callbackQueryId(callbackId)
+                    .text(response) // Pop-up banner text
+                    .showAlert(false) // Set to true for a modal popup box
+                    .build();
+
             // Send answer confirmation back via TelegramClient
+            System.out.println("sending back");
             this.telegramClient.execute(answer);
         } catch (Exception e) {
             e.printStackTrace();

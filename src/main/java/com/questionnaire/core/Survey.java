@@ -61,6 +61,10 @@ public class Survey {
         int questionIdx = Integer.parseInt(arr[0]);
         int answerIdx = Integer.parseInt(arr[1]);
 
+        if (this.questions == null) {
+            return Constants.SOMETHING_WENT_WRONG;
+        }
+
         if (questionIdx >= this.questions.size()) {
             return Constants.INVALID_QUESTION;
         }
