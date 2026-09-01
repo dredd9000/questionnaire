@@ -17,6 +17,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import com.questionnaire.core.CoreConstants;
+import com.questionnaire.core.TelegramCom;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -28,6 +29,7 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 public class CreatePollPanel extends JPanel {
+    private TelegramCom telegramCom;
 
     private JRadioButton manualRadio;
     private JRadioButton aiRadio;
@@ -49,7 +51,9 @@ public class CreatePollPanel extends JPanel {
     private Runnable onLaunchCallback;
     private java.util.function.Consumer<String> onAiGenerateCallback;
 
-    public CreatePollPanel() {
+    public CreatePollPanel(TelegramCom telegramCom) {
+        this.telegramCom = telegramCom;
+
         this.questionBlocks = new ArrayList<>();
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));

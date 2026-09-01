@@ -115,4 +115,8 @@ public class TelegramCom {
             Utils.sleep(CoreConstants.SEND_SLEEP_DELAY);
         }
     }
+
+    public long getClientsCount() {
+        return this.clientManager.getClientsCount();
+    }
 }

@@ -48,8 +48,8 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
                 // Instantly hand off the update to TelegramCom
                 updateHandler.accept(update);
 
-                this.sendQuestion(update.getMessage().getChatId(),
-                        new Question("question", List.of("1", "2", "3", "4")));
+                // this.sendQuestion(update.getMessage().getChatId(),
+                // new Question("question", List.of("1", "2", "3", "4")));
             } else if (update.hasCallbackQuery()) {
                 this.handleButtonClick(update);
             }

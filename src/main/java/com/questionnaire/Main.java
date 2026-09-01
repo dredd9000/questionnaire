@@ -5,8 +5,8 @@ import com.questionnaire.core.TelegramCom;
 
 public class Main {
     public static void main(String[] args) {
-        new TelegramCom();
+        TelegramCom telegramCom = new TelegramCom();
 
-        new MainFrame();
+        new MainFrame(telegramCom);
     }
 }

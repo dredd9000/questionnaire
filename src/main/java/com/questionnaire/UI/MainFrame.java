@@ -3,12 +3,18 @@ package com.questionnaire.UI;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
+import com.questionnaire.core.TelegramCom;
+
 public class MainFrame {
+    private TelegramCom telegramCom;
+
     private JFrame frame;
     private CommunityPanel communityPanel;
     private CreatePollPanel createPollPanel;
 
-    public MainFrame() {
+    public MainFrame(TelegramCom telegramCom) {
+        this.telegramCom = telegramCom;
+
         this.initFrame();
 
         this.initPanelsAndTabs();
@@ -28,8 +34,8 @@ public class MainFrame {
     }
 
     private void initPanelsAndTabs() {
-        this.communityPanel = new CommunityPanel();
-        this.createPollPanel = new CreatePollPanel();
+        this.communityPanel = new CommunityPanel(this.telegramCom);
+        this.createPollPanel = new CreatePollPanel(this.telegramCom);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.communityPanel, this.createPollPanel);
 

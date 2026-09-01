@@ -7,16 +7,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
+import com.questionnaire.core.TelegramCom;
+import com.questionnaire.core.model.Client;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 
 public class CommunityPanel extends JPanel {
+    private TelegramCom telegramCom;
+
     // 1. Keep a reference to DefaultTableModel so you can modify it later
     private DefaultTableModel tableModel;
     private JLabel totalMembersLabel;
 
-    public CommunityPanel() {
+    public CommunityPanel(TelegramCom telegramCom) {
+        this.telegramCom = telegramCom;
+
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -25,6 +33,8 @@ public class CommunityPanel extends JPanel {
 
         JScrollPane tableScrollPane = createTablePanel();
         add(tableScrollPane, BorderLayout.CENTER);
+
+        this.initClientJoinThread();
     }
 
     private JPanel createStatsPanel() {
@@ -35,7 +45,7 @@ public class CommunityPanel extends JPanel {
 
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD, 13f));
 
-        this.totalMembersLabel = new JLabel("0");
+        this.totalMembersLabel = new JLabel(this.telegramCom.getClientsCount() + "");
         this.totalMembersLabel.setFont(this.totalMembersLabel.getFont().deriveFont(Font.BOLD, 13f));
 
         panel.add(totalLabel);
@@ -83,5 +93,20 @@ public class CommunityPanel extends JPanel {
         SwingUtilities.invokeLater(() -> {
             this.totalMembersLabel.setText(num + "");
         });
+    }
+
+    private void initClientJoinThread() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Client client = this.telegramCom.getNewClientQueue().take();
+
+                    this.addClientRow(client.getFullName(), client.getUserName(), client.getTimeString());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
     }
 }
