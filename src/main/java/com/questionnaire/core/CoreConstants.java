@@ -11,6 +11,7 @@ public class CoreConstants {
 
     public static final int MIN_ANSWERS = 2;
     public static final int MAX_ANSWERS = 4;
+    public static final int MIN_QUESTIONS = 1;
     public static final int MAX_QUESTIONS = 3;
 
     public static final int MIN_CLIENTS = 3;
@@ -25,4 +26,11 @@ public class CoreConstants {
     public static final String YOU_ALREADY_ANSWERED_TO_THIS_QUESTION = "You already answered to this question";
     public static final String THANK_YOU = "Thank you";
 
+    /* questions limitations */
+    public static final int MIN_CHARS_IN_QUESTION = 2;
+    public static final int MAX_CHARS_IN_QUESTION = 500;
+
+    /* answers limitations */
+    public static final int MIN_CHARS_IN_ANSWER = 1;
+    public static final int MAX_CHARS_IN_ANSWER = 50;
 }

@@ -2,7 +2,10 @@ package com.questionnaire.UI;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.ToolTipManager;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.questionnaire.core.TelegramCom;
 
 public class MainFrame {
@@ -15,11 +18,20 @@ public class MainFrame {
     public MainFrame(TelegramCom telegramCom) {
         this.telegramCom = telegramCom;
 
+        this.generalConfig();
+
         this.initFrame();
 
         this.initPanelsAndTabs();
 
         this.frame.setVisible(true);
+    }
+
+    private void generalConfig() {
+        FlatLightLaf.setup();
+
+        ToolTipManager.sharedInstance().setInitialDelay(100);
+
     }
 
     private void initFrame() {

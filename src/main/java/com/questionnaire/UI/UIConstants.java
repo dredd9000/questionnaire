@@ -8,4 +8,6 @@ public class UIConstants {
 
     public static final String WINDOW_TITLE = "Telegram Poll Management System";
     public static final String COMMUNITY_OVERVIEW = "Community Overview";
+
+    public static final int TOOLTIP_INITIAL_DELAY = 100;
 }

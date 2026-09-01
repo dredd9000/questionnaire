@@ -16,11 +16,11 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import com.questionnaire.UI.helpers.QuestionBlock;
 import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.TelegramCom;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -149,7 +149,7 @@ public class CreatePollPanel extends JPanel {
     }
 
     private void removeQuestionBlock(int index) {
-        if (questionBlocks.size() <= 1)
+        if (questionBlocks.size() <= CoreConstants.MIN_QUESTIONS)
             return; // Must keep at least 1 question
 
         questionsContainer.remove(questionBlocks.get(index));
@@ -205,8 +205,11 @@ public class CreatePollPanel extends JPanel {
         launchPollBtn.setFont(launchPollBtn.getFont().deriveFont(Font.BOLD, 14f));
 
         launchPollBtn.addActionListener(e -> {
-            if (onLaunchCallback != null) {
-                onLaunchCallback.run();
+            // if (onLaunchCallback != null) {
+            // onLaunchCallback.run();
+            // }
+            if (validateForm()) {
+                System.out.println("all set we can start the poll or start timer");
             }
         });
 
@@ -225,95 +228,16 @@ public class CreatePollPanel extends JPanel {
         generateAiBtn.setEnabled(isAi);
     }
 
-    // --- GUARDRAIL VALIDATION METHOD ---
-    public void updateGuardrailStatus(int communitySize, boolean hasActivePoll) {
-        if (hasActivePoll) {
-            launchPollBtn.setEnabled(false);
-            statusBannerLabel.setText("⚠️ A poll is currently active. Only one active poll is allowed.");
-            statusBannerLabel.setForeground(Color.RED);
-        } else if (communitySize < CoreConstants.MAX_QUESTIONS) {
-            launchPollBtn.setEnabled(false);
-            statusBannerLabel
-                    .setText("⚠️ Cannot launch poll: Minimum " + CoreConstants.MIN_CLIENTS
-                            + " members required (Current: " + communitySize + ")");
-            statusBannerLabel.setForeground(Color.ORANGE.darker());
-        } else {
-            launchPollBtn.setEnabled(true);
-            statusBannerLabel.setText("✅ Ready to launch poll to " + communitySize + " members.");
-            statusBannerLabel.setForeground(new Color(34, 139, 34)); // Forest Green
-        }
-    }
+    private boolean validateForm() {
+        boolean isValid = true;
 
-    // --- HELPER CLASS FOR INDIVIDUAL QUESTION BLOCKS ---
-    private static class QuestionBlock extends JPanel {
-        private final JLabel titleLabel;
-        private final JTextField questionField;
-        private final JPanel optionsPanel;
-        private final List<JTextField> optionFields;
-        private final JButton addOptionBtn;
-        private final JButton removeQuestionBtn;
-
-        public QuestionBlock(int number, Runnable onDelete) {
-            setLayout(new BorderLayout(5, 5));
-            setBorder(BorderFactory.createTitledBorder("Question " + number));
-
-            optionFields = new ArrayList<>();
-            titleLabel = new JLabel("Question Wording:");
-
-            questionField = new JTextField();
-            JPanel top = new JPanel(new BorderLayout(5, 5));
-            top.add(titleLabel, BorderLayout.WEST);
-            top.add(questionField, BorderLayout.CENTER);
-
-            removeQuestionBtn = new JButton("Remove Question");
-            removeQuestionBtn.addActionListener(e -> onDelete.run());
-            top.add(removeQuestionBtn, BorderLayout.EAST);
-
-            add(top, BorderLayout.NORTH);
-
-            optionsPanel = new JPanel();
-            optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-            add(optionsPanel, BorderLayout.CENTER);
-
-            addOptionBtn = new JButton("+ Add Choice (Max " + CoreConstants.MAX_ANSWERS + ")");
-            addOptionBtn.addActionListener(e -> addOptionField());
-
-            JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            bottom.add(addOptionBtn);
-            add(bottom, BorderLayout.SOUTH);
-
-            // Default: 2 minimum options required
-            for (int i = 0; i < CoreConstants.MIN_ANSWERS; i++) {
-                addOptionField();
+        for (QuestionBlock questionBlock : questionBlocks) {
+            if (!questionBlock.validateFields()) {
+                isValid = false;
             }
         }
 
-        public void setQuestionNumber(int number) {
-            setBorder(BorderFactory.createTitledBorder("Question " + number));
-        }
-
-        public void setDeleteEnabled(boolean enabled) {
-            removeQuestionBtn.setEnabled(enabled);
-        }
-
-        private void addOptionField() {
-            if (optionFields.size() >= CoreConstants.MAX_ANSWERS)
-                return;
-
-            int optNum = optionFields.size() + 1;
-            JPanel optRow = new JPanel(new BorderLayout(5, 5));
-            JLabel label = new JLabel("Choice " + optNum + ": ");
-            JTextField optField = new JTextField(20);
-
-            optionFields.add(optField);
-            optRow.add(label, BorderLayout.WEST);
-            optRow.add(optField, BorderLayout.CENTER);
-
-            optionsPanel.add(optRow);
-            addOptionBtn.setEnabled(optionFields.size() < CoreConstants.MAX_ANSWERS);
-
-            revalidate();
-            repaint();
-        }
+        return isValid;
     }
+    // TODO: connect questions to core
 }
