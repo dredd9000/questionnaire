@@ -30,6 +30,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class CreatePollPanel extends JPanel {
     private TelegramCom telegramCom;
@@ -73,6 +75,14 @@ public class CreatePollPanel extends JPanel {
         // Default setup: start with 1 question block
         addQuestionBlock();
         updateModeState();
+
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                // Fired when CardLayout switches TO this panel
+                resetUi();
+            }
+        });
     }
 
     // --- SECTION 1: Creation Mode (Manual vs AI) ---
@@ -270,5 +280,42 @@ public class CreatePollPanel extends JPanel {
         return this.questionBlocks.stream()
                 .map(qb -> qb.createQuestionObject())
                 .toList();
+    }
+
+    public void resetUi() {
+        // 1. Reset Creation Mode to Manual Entry
+        if (manualRadio != null) {
+            manualRadio.setSelected(true);
+        }
+        if (aiTopicField != null) {
+            aiTopicField.setText("");
+            aiTopicField.putClientProperty(com.formdev.flatlaf.FlatClientProperties.OUTLINE, null);
+        }
+        updateModeState();
+
+        // 2. Clear dynamic Question Blocks and restore to 1 empty block
+        if (questionBlocks != null && questionsContainer != null) {
+            questionBlocks.clear();
+            questionsContainer.removeAll();
+            addQuestionBlock(); // Re-adds initial default question block
+        }
+
+        // 3. Reset Dispatch Timing to Immediate (Default 3 mins in spinner)
+        if (immediateRadio != null) {
+            immediateRadio.setSelected(true);
+        }
+        if (delayMinutesSpinner != null) {
+            delayMinutesSpinner.setValue(3);
+            delayMinutesSpinner.setEnabled(false);
+        }
+
+        // 4. Reset Status Banner
+        if (statusBannerLabel != null) {
+            statusBannerLabel.setText(" ");
+        }
+
+        // 5. Refresh UI Layout
+        revalidate();
+        repaint();
     }
 }
