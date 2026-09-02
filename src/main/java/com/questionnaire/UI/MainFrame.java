@@ -6,7 +6,6 @@ import javax.swing.ToolTipManager;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.questionnaire.Globals;
-import com.questionnaire.UI.helpers.ToastNotification;
 import com.questionnaire.core.TelegramCom;
 
 public class MainFrame {
