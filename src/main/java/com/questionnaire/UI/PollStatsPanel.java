@@ -19,6 +19,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.questionnaire.Globals;
+import com.questionnaire.UI.enums.PollStatus;
 import com.questionnaire.core.TelegramCom;
 import com.questionnaire.core.model.Client;
 
@@ -84,7 +85,7 @@ public class PollStatsPanel extends JPanel {
         tablePanel.setBorder(BorderFactory.createTitledBorder("Community Participants"));
 
         // Column headers for tracking user state and responses
-        String[] columns = { "Client ID", "Full Name", "Username", "Joined At", "Chat ID" };
+        String[] columns = { "Full Name", "Answered", "Status" };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -161,11 +162,9 @@ public class PollStatsPanel extends JPanel {
 
         for (Client client : activeGroup) {
             tableModel.addRow(new Object[] {
-                    client.getClientId(),
                     client.getFullName(),
-                    client.getUserName(),
-                    client.getTimeString(),
-                    client.getChatId()
+                    "0/" + this.telegramCom.getSurvey().getQuestions().size(),
+                    PollStatus.PENDING
             });
         }
     }
