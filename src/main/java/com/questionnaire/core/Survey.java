@@ -88,7 +88,6 @@ public class Survey {
         int answerIdx = Integer.parseInt(arr[1]);
 
         if (this.questions == null || !this.isMyQuestionById(questionIdx)) {
-            System.out.printf("questionIdx: %d, size: %d%n", questionIdx, this.questions.size());
             return CoreConstants.INVALID_QUESTION;
         }
 
