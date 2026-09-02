@@ -288,7 +288,7 @@ public class CreatePollPanel extends JPanel {
     }
 
     public int getDelayInMin() {
-        return this.delayMinutesSpinner.getComponentCount();
+        return (int) this.delayMinutesSpinner.getValue();
     }
 
     public List<Question> getQuestionsList() {
