@@ -1,10 +1,10 @@
 package com.questionnaire.core;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
 import com.questionnaire.core.enums.ESurveyStatus;
@@ -16,10 +16,10 @@ import lombok.Data;
 
 @Data
 public class Survey {
-    private List<Question> questions;
-    private Set<Client> group;
+    private Map<Integer, Question> questions;
+    private ClientManager group; // current group
     private ESurveyStatus status;
-    private ClientManager clientManager;
+    private ClientManager clientManager; // general community
     private final BlockingQueue<Answer> newAnswer;
     private final BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup;
 
@@ -28,7 +28,7 @@ public class Survey {
             BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup) {
         this.status = ESurveyStatus.PRE;
 
-        this.group = new HashSet<>();
+        this.group = new ClientManager();
 
         this.clientManager = clientManager;
 
@@ -37,22 +37,23 @@ public class Survey {
         this.newAnswer = newAnswer;
     }
 
+    private boolean isMyQuestionById(int questionId) {
+        return this.questions.get(questionId) != null;
+    }
+
     public void startSurvey(List<Question> questions) {
         this.status = ESurveyStatus.STARTED;
-        this.questions = questions;
+        this.questions = new ConcurrentHashMap<>();
         this.createGroup();
 
         for (Question question : questions) {
-            this.broadcastQuestionToGroup.accept(this.group, question);
+            this.questions.put(question.getQuestionId(), question);
+            this.broadcastQuestionToGroup.accept(this.group.getClientsList(), question);
         }
     }
 
     private void createGroup() {
-        this.group.clear();
-
-        for (Client client : this.clientManager.getClientsList()) {
-            this.group.add(client);
-        }
+        this.group.copyFromClientManager(this.clientManager);
     }
 
     public void endSurvey() {
@@ -64,7 +65,19 @@ public class Survey {
         this.status = ESurveyStatus.PRE;
     }
 
+    public boolean isSurveyStarted() {
+        return this.status == ESurveyStatus.STARTED;
+    }
+
     public String recordAnswer(long clientId, String res) {
+        if (this.status != ESurveyStatus.STARTED) {
+            return CoreConstants.POLL_DID_NOT_STARTED_YET;
+        }
+
+        if (!this.group.isInGroup(clientId)) {
+            return CoreConstants.YOU_NOT_GROUP_MEMBER_OF_THIS_POLL;
+        }
+
         String[] arr = res.split(CoreConstants.ANSWER_DELIMITER);
 
         if (arr.length != 2) {
@@ -74,11 +87,8 @@ public class Survey {
         int questionIdx = Integer.parseInt(arr[0]);
         int answerIdx = Integer.parseInt(arr[1]);
 
-        if (this.questions == null) {
-            return CoreConstants.SOMETHING_WENT_WRONG;
-        }
-
-        if (questionIdx >= this.questions.size()) {
+        if (this.questions == null || !this.isMyQuestionById(questionIdx)) {
+            System.out.printf("questionIdx: %d, size: %d%n", questionIdx, this.questions.size());
             return CoreConstants.INVALID_QUESTION;
         }
 

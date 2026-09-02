@@ -28,4 +28,17 @@ public class ClientManager {
     public Collection<Client> getClientsList() {
         return this.clients.values();
     }
+
+    public void clear() {
+        this.clients.clear();
+    }
+
+    public boolean isInGroup(long clientId) {
+        return this.getClientById(clientId) != null;
+    }
+
+    public void copyFromClientManager(ClientManager other) {
+        this.clear();
+        this.clients.putAll(other.clients);
+    }
 }

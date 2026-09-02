@@ -25,6 +25,8 @@ public class CoreConstants {
     public static final String INVALID_ANSWER = "Invalid answer";
     public static final String YOU_ALREADY_ANSWERED_TO_THIS_QUESTION = "You already answered to this question";
     public static final String THANK_YOU = "Thank you";
+    public static final String POLL_DID_NOT_STARTED_YET = "Poll did not started yet";
+    public static final String YOU_NOT_GROUP_MEMBER_OF_THIS_POLL = "You not group member of this poll";
 
     /* questions limitations */
     public static final int MIN_CHARS_IN_QUESTION = 2;
