@@ -273,13 +273,14 @@ public class CreatePollPanel extends JPanel {
         }
 
         if (!InputValidations.isInRange(questionsCount, CoreConstants.MIN_QUESTIONS, CoreConstants.MAX_QUESTIONS)) {
-            Globals.alert("There should be " + CoreConstants.MIN_QUESTIONS + " to " + CoreConstants.MAX_QUESTIONS
-                    + " questions");
+            Globals.toast
+                    .error("There should be " + CoreConstants.MIN_QUESTIONS + " to " + CoreConstants.MAX_QUESTIONS
+                            + " questions");
             isValid = false;
         }
 
         if (this.telegramCom.getClientsCount() < CoreConstants.MIN_CLIENTS) {
-            Globals.alert("Should be atlas " + CoreConstants.MIN_CLIENTS + " clients in the community");
+            Globals.toast.error("Should be atlas " + CoreConstants.MIN_CLIENTS + " clients in the community");
             isValid = false;
         }
 

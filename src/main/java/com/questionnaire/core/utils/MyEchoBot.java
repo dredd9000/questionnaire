@@ -127,7 +127,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             return true;
         } catch (TelegramApiException e) {
             // Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
-            Globals.alert(CoreConstants.SOMETHING_WENT_WRONG);
+            Globals.toast.error(CoreConstants.SOMETHING_WENT_WRONG);
             e.printStackTrace();
             return false;
         }
@@ -177,7 +177,7 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
                     e.getMessage());
 
             // Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
-            Globals.alert(CoreConstants.SOMETHING_WENT_WRONG);
+            Globals.toast.error(CoreConstants.SOMETHING_WENT_WRONG);
 
             return false;
         }

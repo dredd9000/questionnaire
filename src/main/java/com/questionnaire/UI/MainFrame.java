@@ -43,7 +43,7 @@ public class MainFrame {
 
         this.frame.setLocationRelativeTo(null);
 
-        Globals.initToast(this.frame);
+        Globals.toast = new Toast(this.frame);
     }
 
     private void initPanelsAndTabs() {

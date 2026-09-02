@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.swing.JFrame;
 
+import com.questionnaire.UI.enums.ToastType;
 import com.questionnaire.UI.helpers.ToastMessage;
 import com.questionnaire.UI.helpers.ToastNotification;
 import com.questionnaire.core.CoreConstants;
@@ -19,6 +20,18 @@ public class Toast {
         this.toastNotification = new ToastNotification(frame);
 
         this.popThread();
+    }
+
+    public void error(String message) {
+        this.add(message, ToastType.ERROR);
+    }
+
+    public void info(String message) {
+        this.add(message, ToastType.INFO);
+    }
+
+    public void add(String message, ToastType toastType) {
+        this.msgsQueue.add(new ToastMessage(message, toastType));
     }
 
     private void popThread() {

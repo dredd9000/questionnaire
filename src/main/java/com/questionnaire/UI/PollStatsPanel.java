@@ -126,7 +126,7 @@ public class PollStatsPanel extends JPanel {
 
         this.telegramCom.getSurvey().startSurvey(this.createPollPanel.getQuestionsList());
 
-        Globals.alert("The poll sent to members and live now");
+        Globals.toast.error("The poll sent to members and live now");
 
         this.loadActiveSurveyData();
     }
