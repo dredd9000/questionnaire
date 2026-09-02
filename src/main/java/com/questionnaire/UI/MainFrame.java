@@ -13,7 +13,7 @@ public class MainFrame {
 
     private JFrame frame;
     private CommunityPanel communityPanel;
-    private CreatePollPanel createPollPanel;
+    private RightSidePanel rightSidePanel;
 
     public MainFrame(TelegramCom telegramCom) {
         this.telegramCom = telegramCom;
@@ -48,9 +48,9 @@ public class MainFrame {
 
     private void initPanelsAndTabs() {
         this.communityPanel = new CommunityPanel(this.telegramCom);
-        this.createPollPanel = new CreatePollPanel(this.telegramCom);
+        this.rightSidePanel = new RightSidePanel(this.telegramCom);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.communityPanel, this.createPollPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, this.communityPanel, this.rightSidePanel);
 
         splitPane.setResizeWeight(UIConstants.PANELS_SPLIT_RATIO);
         splitPane.setContinuousLayout(true);

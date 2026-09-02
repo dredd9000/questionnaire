@@ -33,6 +33,7 @@ import java.awt.event.ActionListener;
 
 public class CreatePollPanel extends JPanel {
     private TelegramCom telegramCom;
+    private RightSidePanel rightSidePanel;
 
     private JRadioButton manualRadio;
     private JRadioButton aiRadio;
@@ -52,8 +53,9 @@ public class CreatePollPanel extends JPanel {
 
     private java.util.function.Consumer<String> onAiGenerateCallback;
 
-    public CreatePollPanel(TelegramCom telegramCom) {
+    public CreatePollPanel(TelegramCom telegramCom, RightSidePanel rightSidePanel) {
         this.telegramCom = telegramCom;
+        this.rightSidePanel = rightSidePanel;
 
         this.questionBlocks = new ArrayList<>();
         setLayout(new BorderLayout(15, 15));
@@ -214,6 +216,8 @@ public class CreatePollPanel extends JPanel {
                         .toList();
 
                 this.telegramCom.getSurvey().startSurvey(questions);
+
+                this.rightSidePanel.showPanel(RightSidePanel.CARD_COUNTDOWN);
             }
         });
 
