@@ -48,6 +48,7 @@ public class Survey {
 
         for (Question question : questions) {
             this.questions.put(question.getQuestionId(), question);
+            // System.out.println(question.toString());
             this.broadcastQuestionToGroup.accept(this.group.getClientsList(), question);
         }
     }

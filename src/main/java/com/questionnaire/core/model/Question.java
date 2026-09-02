@@ -31,7 +31,7 @@ public class Question {
         int i = 1;
         for (String answer : answers) {
             this.answers.add(answer);
-            if (++i == CoreConstants.MAX_ANSWERS) {
+            if (i++ == CoreConstants.MAX_ANSWERS) {
                 break;
             }
         }
