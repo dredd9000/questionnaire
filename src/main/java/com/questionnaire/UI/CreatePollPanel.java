@@ -21,6 +21,7 @@ import com.questionnaire.UI.helpers.InputValidations;
 import com.questionnaire.UI.helpers.QuestionBlock;
 import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.TelegramCom;
+import com.questionnaire.core.model.Question;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -49,8 +50,6 @@ public class CreatePollPanel extends JPanel {
     private JButton launchPollBtn;
     private JLabel statusBannerLabel;
 
-    // Callbacks/Listeners for main logic integration
-    private Runnable onLaunchCallback;
     private java.util.function.Consumer<String> onAiGenerateCallback;
 
     public CreatePollPanel(TelegramCom telegramCom) {
@@ -207,11 +206,14 @@ public class CreatePollPanel extends JPanel {
         launchPollBtn.setFont(launchPollBtn.getFont().deriveFont(Font.BOLD, 14f));
 
         launchPollBtn.addActionListener(e -> {
-            // if (onLaunchCallback != null) {
-            // onLaunchCallback.run();
-            // }
             if (validateForm()) {
                 System.out.println("all set we can start the poll or start timer");
+
+                List<Question> questions = this.questionBlocks.stream()
+                        .map(qb -> qb.createQuestionObject())
+                        .toList();
+
+                this.telegramCom.getSurvey().startSurvey(questions);
             }
         });
 
@@ -255,5 +257,4 @@ public class CreatePollPanel extends JPanel {
 
         return isValid;
     }
-    // TODO: connect questions to core
 }

@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.questionnaire.core.CoreConstants;
+import com.questionnaire.core.model.Question;
 
 public class QuestionBlock extends JPanel {
     private final JLabel titleLabel;
@@ -130,6 +131,14 @@ public class QuestionBlock extends JPanel {
         }
 
         return isValid;
+    }
+
+    public Question createQuestionObject() {
+        List<String> options = this.optionFields.stream()
+                .map(tf -> tf.getText())
+                .toList();
+
+        return new Question(this.questionField.getText(), options);
     }
 
 }

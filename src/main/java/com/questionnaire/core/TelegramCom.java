@@ -19,6 +19,8 @@ public class TelegramCom {
     private final ClientManager clientManager;
     private final MyEchoBot myEchoBot;
     private final TelegramBotsLongPollingApplication botsApplication;
+
+    @Getter
     private final Survey survey;
 
     @Getter

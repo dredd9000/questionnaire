@@ -14,7 +14,7 @@ public class CoreConstants {
     public static final int MIN_QUESTIONS = 1;
     public static final int MAX_QUESTIONS = 3;
 
-    public static final int MIN_CLIENTS = 3;
+    public static final int MIN_CLIENTS = 1; // ! TODO: bring back to 3
 
     public static final String ANSWER_DELIMITER = ":";
 
