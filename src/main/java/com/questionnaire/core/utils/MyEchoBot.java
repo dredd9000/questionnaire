@@ -126,7 +126,8 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             telegramClient.execute(msg);
             return true;
         } catch (TelegramApiException e) {
-            Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
+            // Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
+            Globals.alert(CoreConstants.SOMETHING_WENT_WRONG);
             e.printStackTrace();
             return false;
         }
@@ -175,7 +176,8 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             System.err.println("Failed to send question to chat " + chatId + ": " +
                     e.getMessage());
 
-            Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
+            // Globals.generalMsgs.add(CoreConstants.SOMETHING_WENT_WRONG);
+            Globals.alert(CoreConstants.SOMETHING_WENT_WRONG);
 
             return false;
         }

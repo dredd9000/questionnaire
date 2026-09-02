@@ -4,8 +4,9 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 import javax.swing.ToolTipManager;
 
-import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.questionnaire.Globals;
+import com.questionnaire.UI.helpers.ToastNotification;
 import com.questionnaire.core.TelegramCom;
 
 public class MainFrame {
@@ -43,6 +44,7 @@ public class MainFrame {
 
         this.frame.setLocationRelativeTo(null);
 
+        Globals.initToast(this.frame);
     }
 
     private void initPanelsAndTabs() {

@@ -16,6 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
+import com.questionnaire.Globals;
+import com.questionnaire.UI.helpers.InputValidations;
 import com.questionnaire.UI.helpers.QuestionBlock;
 import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.TelegramCom;
@@ -231,10 +233,24 @@ public class CreatePollPanel extends JPanel {
     private boolean validateForm() {
         boolean isValid = true;
 
+        int questionsCount = 0;
+
         for (QuestionBlock questionBlock : questionBlocks) {
             if (!questionBlock.validateFields()) {
                 isValid = false;
             }
+            questionsCount++;
+        }
+
+        if (!InputValidations.isInRange(questionsCount, CoreConstants.MIN_QUESTIONS, CoreConstants.MAX_QUESTIONS)) {
+            Globals.alert("There should be " + CoreConstants.MIN_QUESTIONS + " to " + CoreConstants.MAX_QUESTIONS
+                    + " questions");
+            isValid = false;
+        }
+
+        if (this.telegramCom.getClientsCount() < CoreConstants.MIN_CLIENTS) {
+            Globals.alert("Should be atlas " + CoreConstants.MIN_CLIENTS + " clients in the community");
+            isValid = false;
         }
 
         return isValid;
