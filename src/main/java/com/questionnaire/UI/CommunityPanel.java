@@ -59,9 +59,9 @@ public class CommunityPanel extends JPanel {
         String[] columns = { "Name", "Telegram Username", "Joined At" };
 
         Object[][] data = {
-                { "Danny Cohen", "@danny", "12:35" },
-                { "Yael Levi", "@yael", "12:42" },
-                { "Uri Israeli", "@uri", "13:01" }
+                // { "Danny Cohen", "@danny", "12:35" },
+                // { "Yael Levi", "@yael", "12:42" },
+                // { "Uri Israeli", "@uri", "13:01" }
         };
 
         // 2. Initialize the instance variable tableModel
