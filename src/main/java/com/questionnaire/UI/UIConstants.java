@@ -10,4 +10,9 @@ public class UIConstants {
     public static final String COMMUNITY_OVERVIEW = "Community Overview";
 
     public static final int TOOLTIP_INITIAL_DELAY = 100;
+
+    public static final int DELAY_SPINNER_DEFAULT = 3;
+    public static final int DELAY_SPINNER_MIN = 1;
+    public static final int DELAY_SPINNER_MAX = 60;
+    public static final int DELAY_SPINNER_STEP = 1;
 }

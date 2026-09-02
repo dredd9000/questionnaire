@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.questionnaire.Globals;
 import com.questionnaire.core.TelegramCom;
 import com.questionnaire.core.model.Client;
 
@@ -124,6 +125,8 @@ public class PollStatsPanel extends JPanel {
         this.resetUi();
 
         this.telegramCom.getSurvey().startSurvey(this.createPollPanel.getQuestionsList());
+
+        Globals.alert("The poll sent to members and live now");
 
         this.loadActiveSurveyData();
     }

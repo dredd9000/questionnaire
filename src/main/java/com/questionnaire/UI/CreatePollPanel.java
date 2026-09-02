@@ -199,8 +199,23 @@ public class CreatePollPanel extends JPanel {
         timingGroup.add(immediateRadio);
         timingGroup.add(delayedRadio);
 
-        delayMinutesSpinner = new JSpinner(new SpinnerNumberModel(3, 1, 60, 1));
+        delayMinutesSpinner = new JSpinner(new SpinnerNumberModel(
+                UIConstants.DELAY_SPINNER_DEFAULT,
+                UIConstants.DELAY_SPINNER_MIN,
+                UIConstants.DELAY_SPINNER_MAX,
+                UIConstants.DELAY_SPINNER_STEP));
         delayMinutesSpinner.setEnabled(false);
+
+        // Access the underlying JFormattedTextField of the JSpinner editor
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) delayMinutesSpinner.getEditor();
+        javax.swing.JFormattedTextField textField = editor.getTextField();
+
+        // Configure the NumberFormatter to block negative numbers and invalid
+        // characters
+        javax.swing.text.NumberFormatter formatter = (javax.swing.text.NumberFormatter) textField.getFormatter();
+        formatter.setAllowsInvalid(false); // Blocks typing invalid characters (e.g. letters, '-')
+        formatter.setMinimum(UIConstants.DELAY_SPINNER_MIN); // Prevents negative numbers
+        formatter.setMaximum(UIConstants.DELAY_SPINNER_MAX); // Max upper limit matching SpinnerNumberModel
 
         delayedRadio.addActionListener(e -> delayMinutesSpinner.setEnabled(delayedRadio.isSelected()));
         immediateRadio.addActionListener(e -> delayMinutesSpinner.setEnabled(!immediateRadio.isSelected()));
@@ -219,7 +234,6 @@ public class CreatePollPanel extends JPanel {
 
         launchPollBtn.addActionListener(e -> {
             if (validateForm()) {
-                System.out.println("all set we can start the poll or start timer");
 
                 String panelToShow = RightSidePanel.CARD_COUNTDOWN;
 
