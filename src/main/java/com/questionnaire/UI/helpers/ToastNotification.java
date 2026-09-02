@@ -13,6 +13,8 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import com.questionnaire.UI.enums.ToastType;
+
 public class ToastNotification {
     private final JFrame parentFrame;
 
@@ -36,52 +38,35 @@ public class ToastNotification {
         this.parentFrame = parentFrame;
     }
 
-    public enum Type {
-        SUCCESS(new Color(40, 167, 69), new Color(230, 245, 233), "✅"),
-        WARNING(new Color(255, 193, 7), new Color(255, 248, 225), "⚠️"),
-        ERROR(new Color(220, 53, 69), new Color(253, 237, 239), "❌"),
-        INFO(new Color(23, 162, 184), new Color(227, 242, 253), "ℹ️");
-
-        final Color borderColor;
-        final Color bgColor;
-        final String icon;
-
-        Type(Color borderColor, Color bgColor, String icon) {
-            this.borderColor = borderColor;
-            this.bgColor = bgColor;
-            this.icon = icon;
-        }
-    }
-
     public void showError(String message) {
-        this.show(message, Type.ERROR);
+        this.show(message, ToastType.ERROR);
     }
 
     public void showSuccess(String message) {
-        this.show(message, Type.SUCCESS);
+        this.show(message, ToastType.SUCCESS);
     }
 
     public void showWarning(String message) {
-        this.show(message, Type.WARNING);
+        this.show(message, ToastType.WARNING);
     }
 
     public void showInfo(String message) {
-        this.show(message, Type.INFO);
+        this.show(message, ToastType.INFO);
     }
 
-    public void show(String message, Type type) {
+    public void show(String message, ToastType type) {
         SwingUtilities.invokeLater(() -> {
             JWindow toast = new JWindow(this.parentFrame);
             toast.setType(JWindow.Type.POPUP);
 
             // Container Panel with rounded look and color themes
             JPanel panel = new JPanel(new BorderLayout(10, 0));
-            panel.setBackground(type.bgColor);
+            panel.setBackground(type.getBgColor());
             panel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(type.borderColor, 2, true),
+                    BorderFactory.createLineBorder(type.getBorderColor(), 2, true),
                     BorderFactory.createEmptyBorder(10, 15, 10, 15)));
 
-            JLabel iconLabel = new JLabel(type.icon);
+            JLabel iconLabel = new JLabel(type.getIcon());
             iconLabel.setFont(iconLabel.getFont().deriveFont(16f));
 
             JLabel textLabel = new JLabel("<html><b>" + message + "</b></html>");
