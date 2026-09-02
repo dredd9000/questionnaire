@@ -32,7 +32,7 @@ public class TelegramCom {
         this.newClientQueue = new ArrayBlockingQueue<>(CoreConstants.MAX_QUEUE_VALUE);
         this.newAnswer = new ArrayBlockingQueue<>(CoreConstants.MAX_QUEUE_VALUE);
 
-        String botToken = ConfigLoader.getBotToken();
+        String botToken = ConfigLoader.properties.getProperty(ConfigLoader.TELEGRAM_TOKEN_KEY);
 
         // Pass function handle directly into MyEchoBot
         this.botsApplication = new TelegramBotsLongPollingApplication();

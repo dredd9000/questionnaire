@@ -7,10 +7,13 @@ import java.util.Properties;
 public class ConfigLoader {
 
     private static final String CONFIG_PATH = "config.properties";
-    private static final String TELEGRAM_TOKEN_CONF_KEY = "telegram.bot.token";
+    public static final String TELEGRAM_TOKEN_KEY = "telegram.bot.token";
+    public static final String CHATGPT_TOKEN_KEY = "chatgpt.token";
+    public static final String CHATGPT_URL_KEY = "chatgpt.url";
 
-    public static String getBotToken() {
-        Properties properties = new Properties();
+    public static Properties properties = new Properties();
+
+    public static void loadConfig() {
 
         // Load the file from src/main/resources/
         try (InputStream input = ConfigLoader.class.getClassLoader().getResourceAsStream(CONFIG_PATH)) {
@@ -21,9 +24,6 @@ public class ConfigLoader {
 
             // Load properties into the object
             properties.load(input);
-
-            // Fetch the property
-            return properties.getProperty(TELEGRAM_TOKEN_CONF_KEY);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to read config.properties file", e);
