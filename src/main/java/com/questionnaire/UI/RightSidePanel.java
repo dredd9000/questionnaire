@@ -46,7 +46,7 @@ public class RightSidePanel extends JPanel {
 
     private void initPanels() {
         this.createPollPanel = new CreatePollPanel(this.telegramCom, this);
-        this.countdownPanel = new CountdownPanel();
+        this.countdownPanel = new CountdownPanel(this, this.createPollPanel);
         this.pollStatsPanel = new PollStatsPanel();
     }
 

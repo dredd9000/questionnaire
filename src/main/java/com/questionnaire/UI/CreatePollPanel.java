@@ -211,13 +211,13 @@ public class CreatePollPanel extends JPanel {
             if (validateForm()) {
                 System.out.println("all set we can start the poll or start timer");
 
-                List<Question> questions = this.questionBlocks.stream()
-                        .map(qb -> qb.createQuestionObject())
-                        .toList();
+                String panelToShow = RightSidePanel.CARD_COUNTDOWN;
 
-                this.telegramCom.getSurvey().startSurvey(questions);
+                if (this.immediateRadio.isSelected()) {
+                    panelToShow = RightSidePanel.CARD_STATS;
+                }
 
-                this.rightSidePanel.showPanel(RightSidePanel.CARD_COUNTDOWN);
+                this.rightSidePanel.showPanel(panelToShow);
             }
         });
 
@@ -260,5 +260,15 @@ public class CreatePollPanel extends JPanel {
         }
 
         return isValid;
+    }
+
+    public int getDelayInMin() {
+        return this.delayMinutesSpinner.getComponentCount();
+    }
+
+    public List<Question> getQuestionsList() {
+        return this.questionBlocks.stream()
+                .map(qb -> qb.createQuestionObject())
+                .toList();
     }
 }
