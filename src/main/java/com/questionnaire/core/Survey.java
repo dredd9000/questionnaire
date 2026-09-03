@@ -1,5 +1,6 @@
 package com.questionnaire.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -115,5 +116,28 @@ public class Survey {
         }
 
         return answerResponse;
+    }
+
+    public void notifyClientsNotCompletedSurvey() {
+        List<Client> clientsToNotify = new ArrayList<>();
+
+        synchronized (this) {
+            int questionsCount = this.questions.size();
+
+            for (Client client : this.group.getClientsList()) {
+                int count = 0;
+                for (Question question : this.questions.values()) {
+                    if (question.didIAlreadyAnswered(client)) {
+                        count++;
+                    }
+                }
+
+                if (count != questionsCount) {
+                    clientsToNotify.add(client);
+                }
+            }
+        }
+
+        this.broadcastMessageToGroup.accept(clientsToNotify, "Please answer to all questions");
     }
 }

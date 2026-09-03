@@ -37,6 +37,6 @@ public class CoreConstants {
     public static final int MAX_CHARS_IN_ANSWER = 50;
 
     /* survey timers limits */
-    public static final int MAX_SURVEY_TIME_SEC = 1 * 60; // TODO: bring back to 5
-    public static final int NOTIFY_AFTER_SEC = 3 * 60;
+    public static final int MAX_SURVEY_TIME_SEC = 1 * 60; // TODO: bring back to 5 * 60
+    public static final int NOTIFY_AFTER_SEC = 30; // TODO: bring back to 3 * 60
 }

@@ -65,7 +65,7 @@ public class PollStatsPanel extends JPanel {
 
         this.clientRowMap = new ConcurrentHashMap<>();
 
-        this.remainingSeconds = CoreConstants.MAX_SURVEY_TIME_SEC;
+        this.resetRemaining();
 
         this.initUI();
 
@@ -188,20 +188,20 @@ public class PollStatsPanel extends JPanel {
      * Clears table, resets header state, and stops timers.
      */
     public void resetUi() {
-        if (tableModel != null) {
-            tableModel.setRowCount(0);
+        if (this.tableModel != null) {
+            this.tableModel.setRowCount(0);
         }
 
-        if (statusLabel != null) {
-            statusLabel.setText("Status: LIVE SURVEY IN PROGRESS");
+        if (this.statusLabel != null) {
+            this.statusLabel.setText("Status: LIVE SURVEY IN PROGRESS");
         }
 
         if (this.clientRowMap != null) {
             this.clientRowMap.clear();
         }
 
-        if (countdownTimer != null) {
-            countdownTimer.stop();
+        if (this.countdownTimer != null) {
+            this.countdownTimer.stop();
         }
 
         updateGlobalStatsSummary();
@@ -270,22 +270,30 @@ public class PollStatsPanel extends JPanel {
         }
     }
 
+    private void resetRemaining() {
+        this.remainingSeconds = CoreConstants.MAX_SURVEY_TIME_SEC; // Set remaining time in seconds
+    }
+
     /**
      * Starts or resets the live countdown timer.
      */
     private void startTimer() {
-        remainingSeconds = CoreConstants.MAX_SURVEY_TIME_SEC; // Set remaining time in seconds
+        this.resetRemaining();
 
-        if (countdownTimer != null) {
-            countdownTimer.stop();
+        if (this.countdownTimer != null) {
+            this.countdownTimer.stop();
         }
 
-        countdownTimer = new Timer(1000, e -> {
-            if (remainingSeconds > 0) {
-                remainingSeconds--;
-                int minutes = remainingSeconds / 60;
-                int seconds = remainingSeconds % 60;
+        this.countdownTimer = new Timer(1000, e -> {
+            if (this.remainingSeconds > 0) {
+                this.remainingSeconds--;
+                int minutes = this.remainingSeconds / 60;
+                int seconds = this.remainingSeconds % 60;
                 timeRemainingLabel.setText(String.format("Time Remaining: %02d:%02d", minutes, seconds));
+
+                if (this.remainingSeconds == CoreConstants.NOTIFY_AFTER_SEC) {
+                    this.telegramCom.getSurvey().notifyClientsNotCompletedSurvey();
+                }
             } else {
                 ((Timer) e.getSource()).stop();
                 timeRemainingLabel.setText("Time Remaining: 00:00 (Time's Up)");
@@ -294,7 +302,9 @@ public class PollStatsPanel extends JPanel {
         });
 
         timeRemainingLabel
-                .setText(String.format("Time Remaining: %02d:%02d", remainingSeconds / 60, remainingSeconds % 60));
+                .setText(String.format("Time Remaining: %02d:%02d",
+                        this.remainingSeconds / 60,
+                        this.remainingSeconds % 60));
         countdownTimer.start();
     }
 
