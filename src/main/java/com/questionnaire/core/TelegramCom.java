@@ -6,7 +6,6 @@ import java.util.concurrent.BlockingQueue;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import com.questionnaire.Utils;
 import com.questionnaire.core.model.Answer;
 import com.questionnaire.core.model.Client;
 import com.questionnaire.core.model.Question;
@@ -113,8 +112,6 @@ public class TelegramCom {
             } else if (msg instanceof Question) {
                 this.myEchoBot.addQuestionToQueue(client.getChatId(), (Question) msg);
             }
-
-            Utils.sleep(CoreConstants.SEND_SLEEP_DELAY);
         }
     }
 

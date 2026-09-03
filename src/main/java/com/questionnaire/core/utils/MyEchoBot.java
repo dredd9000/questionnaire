@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.questionnaire.Globals;
+import com.questionnaire.Utils;
 import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.model.Question;
 import com.questionnaire.core.model.SendToTlgrm;
@@ -102,6 +103,8 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
                         this.sendQuestion(obj.getChatId(), (Question) obj.getData());
                     }
 
+                    Utils.sleep(CoreConstants.SEND_SLEEP_DELAY);
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -154,8 +157,8 @@ public class MyEchoBot implements LongPollingUpdateConsumer {
             currentRowButtons.add(btn);
 
             // Group 2 buttons per row, or flush the last remaining button
-            if (currentRowButtons.size() == 2 || i == question.getAnswers().size() -
-                    1) {
+            if (currentRowButtons.size() == 2
+                    || i == question.getAnswers().size() - 1) {
                 rows.add(new InlineKeyboardRow(currentRowButtons));
                 currentRowButtons = new ArrayList<>(); // Reset for next row
             }
