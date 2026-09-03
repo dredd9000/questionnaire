@@ -62,7 +62,12 @@ public class TelegramCom {
     }
 
     private boolean isJoinMsg(String msg) {
-        return CoreConstants.JOIN_KEYWORDS.contains(msg);
+        for (String keyword : CoreConstants.JOIN_KEYWORDS) {
+            if (keyword.equalsIgnoreCase(msg)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleNewUserJoining(Update update) {
