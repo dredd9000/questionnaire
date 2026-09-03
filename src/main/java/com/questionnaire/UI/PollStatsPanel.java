@@ -3,6 +3,7 @@ package com.questionnaire.UI;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Collection;
@@ -18,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,6 +27,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.questionnaire.Globals;
 import com.questionnaire.UI.enums.PollStatus;
 import com.questionnaire.UI.model.RowValueData;
+import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.TelegramCom;
 import com.questionnaire.core.model.Answer;
 import com.questionnaire.core.model.Client;
@@ -38,12 +41,22 @@ public class PollStatsPanel extends JPanel {
     private final CreatePollPanel createPollPanel;
 
     private JLabel statusLabel;
+
+    // Global Stats Labels
     private JLabel totalParticipantsLabel;
+    private JLabel completedCountLabel;
+    private JLabel pendingCountLabel;
+    private JLabel timeRemainingLabel;
+
     private DefaultTableModel tableModel;
     private JTable membersTable;
     private JButton finishPollBtn;
 
     private final Map<Long, RowValueData> clientRowMap;
+
+    // Countdown Timer support
+    private Timer countdownTimer;
+    private int remainingSeconds; // Example duration: 2 minutes (120 seconds)
 
     public PollStatsPanel(TelegramCom telegramCom, RightSidePanel rightSidePanel, CreatePollPanel createPollPanel) {
         this.telegramCom = telegramCom;
@@ -51,6 +64,8 @@ public class PollStatsPanel extends JPanel {
         this.createPollPanel = createPollPanel;
 
         this.clientRowMap = new ConcurrentHashMap<>();
+
+        this.remainingSeconds = CoreConstants.MAX_SURVEY_TIME_SEC;
 
         this.initUI();
 
@@ -69,7 +84,7 @@ public class PollStatsPanel extends JPanel {
         setLayout(new BorderLayout(15, 15));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // 1. TOP: Header & Status Section
+        // 1. TOP: Header & Status Section (Contains Global Stats)
         add(createHeaderPanel(), BorderLayout.NORTH);
 
         // 2. CENTER: Members / Responses Table
@@ -86,11 +101,27 @@ public class PollStatsPanel extends JPanel {
         statusLabel = new JLabel("Status: LIVE SURVEY IN PROGRESS", SwingConstants.LEFT);
         statusLabel.putClientProperty(FlatClientProperties.STYLE, "font: $h3.font");
 
-        totalParticipantsLabel = new JLabel("Total Target Members: 0", SwingConstants.RIGHT);
-        totalParticipantsLabel.setFont(totalParticipantsLabel.getFont().deriveFont(Font.BOLD, 12f));
+        // Panel for Global Statistics Grid
+        JPanel statsGrid = new JPanel(new GridLayout(2, 2, 10, 5));
 
-        headerPanel.add(statusLabel, BorderLayout.WEST);
-        headerPanel.add(totalParticipantsLabel, BorderLayout.EAST);
+        totalParticipantsLabel = new JLabel("Participants: 0");
+        completedCountLabel = new JLabel("Completed: 0");
+        pendingCountLabel = new JLabel("Pending: 0");
+        timeRemainingLabel = new JLabel("Time Remaining: 00:00");
+
+        Font statsFont = totalParticipantsLabel.getFont().deriveFont(Font.BOLD, 12f);
+        totalParticipantsLabel.setFont(statsFont);
+        completedCountLabel.setFont(statsFont);
+        pendingCountLabel.setFont(statsFont);
+        timeRemainingLabel.setFont(statsFont);
+
+        statsGrid.add(totalParticipantsLabel);
+        statsGrid.add(completedCountLabel);
+        statsGrid.add(pendingCountLabel);
+        statsGrid.add(timeRemainingLabel);
+
+        headerPanel.add(statusLabel, BorderLayout.NORTH);
+        headerPanel.add(statsGrid, BorderLayout.CENTER);
 
         return headerPanel;
     }
@@ -150,10 +181,11 @@ public class PollStatsPanel extends JPanel {
         Globals.toast.info("The poll sent to members and live now");
 
         this.loadActiveSurveyData();
+        this.startTimer();
     }
 
     /**
-     * Clears table and resets header state.
+     * Clears table, resets header state, and stops timers.
      */
     public void resetUi() {
         if (tableModel != null) {
@@ -164,13 +196,15 @@ public class PollStatsPanel extends JPanel {
             statusLabel.setText("Status: LIVE SURVEY IN PROGRESS");
         }
 
-        if (totalParticipantsLabel != null) {
-            totalParticipantsLabel.setText("Total Target Members: 0");
-        }
-
         if (this.clientRowMap != null) {
             this.clientRowMap.clear();
         }
+
+        if (countdownTimer != null) {
+            countdownTimer.stop();
+        }
+
+        updateGlobalStatsSummary();
     }
 
     /**
@@ -184,8 +218,6 @@ public class PollStatsPanel extends JPanel {
         // Retrieve client collection from Survey group map values
         Collection<Client> activeGroup = this.telegramCom.getSurvey().getGroup().getClientsList();
 
-        totalParticipantsLabel.setText("Total Target Members: " + activeGroup.size());
-
         int rowIdx = 0;
         for (Client client : activeGroup) {
             this.clientRowMap.put(client.getClientId(), new RowValueData(rowIdx));
@@ -198,14 +230,78 @@ public class PollStatsPanel extends JPanel {
 
             rowIdx++;
         }
+
+        updateGlobalStatsSummary();
+    }
+
+    /**
+     * Calculates current status counts from the table and updates global status
+     * labels.
+     */
+    private synchronized void updateGlobalStatsSummary() {
+        int total = tableModel != null ? tableModel.getRowCount() : 0;
+        int completed = 0;
+        int pending = 0;
+
+        if (tableModel != null) {
+            for (int i = 0; i < total; i++) {
+                Object statusObj = tableModel.getValueAt(i, TABLE_COL_STATUS_IDX);
+                if (statusObj != null) {
+                    String statusStr = statusObj.toString();
+                    if (statusStr.equals(PollStatus.COMPLETED.getLabel())) {
+                        completed++;
+                    } else {
+                        pending++;
+                    }
+                }
+            }
+        }
+
+        if (totalParticipantsLabel != null)
+            totalParticipantsLabel.setText("Participants: " + total);
+        if (completedCountLabel != null)
+            completedCountLabel.setText("Completed: " + completed);
+        if (pendingCountLabel != null)
+            pendingCountLabel.setText("Pending: " + pending);
+    }
+
+    /**
+     * Starts or resets the live countdown timer.
+     */
+    private void startTimer() {
+        remainingSeconds = CoreConstants.MAX_SURVEY_TIME_SEC; // Set remaining time in seconds
+
+        if (countdownTimer != null) {
+            countdownTimer.stop();
+        }
+
+        countdownTimer = new Timer(1000, e -> {
+            if (remainingSeconds > 0) {
+                remainingSeconds--;
+                int minutes = remainingSeconds / 60;
+                int seconds = remainingSeconds % 60;
+                timeRemainingLabel.setText(String.format("Time Remaining: %02d:%02d", minutes, seconds));
+            } else {
+                ((Timer) e.getSource()).stop();
+                timeRemainingLabel.setText("Time Remaining: 00:00 (Time's Up)");
+            }
+        });
+
+        timeRemainingLabel
+                .setText(String.format("Time Remaining: %02d:%02d", remainingSeconds / 60, remainingSeconds % 60));
+        countdownTimer.start();
     }
 
     /**
      * Concludes the current survey and returns to Panel 1 (Create Poll).
      */
     private void endPollAndReset() {
+        if (countdownTimer != null) {
+            countdownTimer.stop();
+        }
+
         if (telegramCom != null && telegramCom.getSurvey() != null) {
-            telegramCom.getSurvey().endSurvey(); // Clears survey group map and changes status[cite: 3]
+            telegramCom.getSurvey().endSurvey(); // Clears survey group map and changes status
         }
 
         // Return back to Create Poll view
@@ -232,8 +328,7 @@ public class PollStatsPanel extends JPanel {
                     e.printStackTrace();
                 }
             }
-        })
-                .start();
+        }).start();
     }
 
     private void updateClientProgress(RowValueData rowValueData) {
@@ -265,6 +360,8 @@ public class PollStatsPanel extends JPanel {
             this.tableModel.setValueAt(answers + "/" + totalQuestions, rowIdx, TABLE_COL_ANSWERS_IDX);
             this.tableModel.setValueAt(status.getLabel(), rowIdx, TABLE_COL_STATUS_IDX);
 
+            // Re-calculate and update global stats labels in real time
+            this.updateGlobalStatsSummary();
         });
     }
 }
