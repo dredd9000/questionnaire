@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import com.questionnaire.core.enums.ESurveyStatus;
 import com.questionnaire.core.model.Answer;
