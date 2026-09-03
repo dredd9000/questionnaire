@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.FlatClientProperties;
@@ -109,6 +110,11 @@ public class PollStatsPanel extends JPanel {
 
         membersTable = new JTable(tableModel);
         membersTable.getTableHeader().setReorderingAllowed(false);
+
+        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+        cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        this.membersTable.setDefaultRenderer(Object.class, cellRenderer);
 
         tablePanel.add(new JScrollPane(membersTable), BorderLayout.CENTER);
         return tablePanel;
