@@ -12,6 +12,7 @@ import com.questionnaire.core.enums.ESurveyStatus;
 import com.questionnaire.core.model.Answer;
 import com.questionnaire.core.model.Client;
 import com.questionnaire.core.model.Question;
+import com.questionnaire.core.model.QuestionResult;
 
 import lombok.Data;
 
@@ -139,5 +140,17 @@ public class Survey {
         }
 
         this.broadcastMessageToGroup.accept(clientsToNotify, "Please answer to all questions");
+    }
+
+    public synchronized List<QuestionResult> getResults() {
+        List<QuestionResult> results = new ArrayList<>();
+
+        Collection<Client> participants = this.group.getClientsList();
+
+        for (Question question : this.questions.values()) {
+            results.add(question.getResults(participants));
+        }
+
+        return results;
     }
 }

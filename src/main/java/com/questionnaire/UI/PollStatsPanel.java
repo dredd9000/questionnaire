@@ -264,10 +264,6 @@ public class PollStatsPanel extends JPanel {
             completedCountLabel.setText("Completed: " + completed);
         if (pendingCountLabel != null)
             pendingCountLabel.setText("Pending: " + pending);
-
-        if (completed == total && total != 0) {
-            this.endPollAndReset();
-        }
     }
 
     private void resetRemaining() {
@@ -319,8 +315,6 @@ public class PollStatsPanel extends JPanel {
         if (telegramCom != null && telegramCom.getSurvey() != null) {
             telegramCom.getSurvey().endSurvey(); // Clears survey group map and changes status
         }
-
-        this.showStatisticsPopup();
 
         // Return back to Create Poll view
         this.rightSidePanel.showPanel(RightSidePanel.CARD_CREATE_POLL);
@@ -381,26 +375,5 @@ public class PollStatsPanel extends JPanel {
             // Re-calculate and update global stats labels in real time
             this.updateGlobalStatsSummary();
         });
-    }
-
-    private void showStatisticsPopup() {
-        StringBuilder sb = new StringBuilder();
-
-        if (totalParticipantsLabel != null) {
-            sb.append(this.totalParticipantsLabel.getText());
-            sb.append("\n");
-        }
-
-        if (completedCountLabel != null) {
-            sb.append(completedCountLabel.getText());
-            sb.append("\n");
-        }
-
-        if (pendingCountLabel != null) {
-            sb.append(pendingCountLabel.getText());
-            sb.append("\n");
-        }
-
-        JOptionPane.showMessageDialog(null, sb.toString(), "Post survey popup", JOptionPane.INFORMATION_MESSAGE);
     }
 }

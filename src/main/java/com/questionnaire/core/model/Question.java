@@ -1,10 +1,12 @@
 package com.questionnaire.core.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.questionnaire.core.CoreConstants;
 
@@ -65,5 +67,23 @@ public class Question {
         this.answeredBy.put(client, answerIdx);
 
         return CoreConstants.THANK_YOU;
+    }
+
+    public QuestionResult getResults(Collection<Client> group) {
+        QuestionResult results = new QuestionResult(this.question);
+
+        int total = group.size();
+
+        Map<Integer, Long> answersCountMap = this.answeredBy.entrySet().stream()
+                .collect(Collectors.groupingBy(e -> e.getValue(), Collectors.counting()));
+
+        for (Map.Entry<Integer, Long> entry : answersCountMap.entrySet()) {
+            AnswerResult answerResult = new AnswerResult(this.answers.get(entry.getKey()),
+                    entry.getValue().intValue(),
+                    total);
+            results.addResult(answerResult);
+        }
+
+        return results;
     }
 }
