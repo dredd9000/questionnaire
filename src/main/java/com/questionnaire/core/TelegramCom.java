@@ -33,12 +33,17 @@ public class TelegramCom {
 
         String botToken = ConfigLoader.properties.getProperty(ConfigLoader.TELEGRAM_TOKEN_KEY);
 
-        // Pass function handle directly into MyEchoBot
         this.botsApplication = new TelegramBotsLongPollingApplication();
 
-        this.survey = new Survey(this.clientManager, this.newAnswer, this::broadcastQuestionToGroup);
+        this.survey = new Survey(
+                this.clientManager,
+                this.newAnswer,
+                this::broadcastQuestionToGroup,
+                this::broadcastMessageToGroup);
 
-        this.myEchoBot = new MyEchoBot(botToken, this::handleUpdate, this.survey::recordAnswer);
+        this.myEchoBot = new MyEchoBot(botToken,
+                this::handleUpdate,
+                this.survey::recordAnswer);
 
         this.startBot(botToken);
     }
@@ -93,9 +98,9 @@ public class TelegramCom {
         this.broadcastExceptToGroup(group, question, null);
     }
 
-    // private void broadcast(String msg) {
-    // this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, null);
-    // }
+    private void broadcastMessageToGroup(Collection<Client> group, String message) {
+        this.broadcastExceptToGroup(group, message, null);
+    }
 
     private void broadcastExcept(String msg, Client excludedClient) {
         this.broadcastExceptToGroup(this.clientManager.getClientsList(), msg, excludedClient);

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.questionnaire.core.enums.ESurveyStatus;
 import com.questionnaire.core.model.Answer;
@@ -22,10 +23,12 @@ public class Survey {
     private ClientManager clientManager; // general community
     private final BlockingQueue<Answer> newAnswer;
     private final BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup;
+    private final BiConsumer<Collection<Client>, String> broadcastMessageToGroup;
 
     public Survey(ClientManager clientManager,
             BlockingQueue<Answer> newAnswer,
-            BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup) {
+            BiConsumer<Collection<Client>, Question> broadcastQuestionToGroup,
+            BiConsumer<Collection<Client>, String> broadcastMessageToGroup) {
         this.status = ESurveyStatus.PRE;
 
         this.group = new ClientManager();
@@ -33,6 +36,7 @@ public class Survey {
         this.clientManager = clientManager;
 
         this.broadcastQuestionToGroup = broadcastQuestionToGroup;
+        this.broadcastMessageToGroup = broadcastMessageToGroup;
 
         this.newAnswer = newAnswer;
     }
@@ -46,9 +50,11 @@ public class Survey {
         this.questions = new ConcurrentHashMap<>();
         this.createGroup();
 
+        this.broadcastMessage("Survey started");
+
         for (Question question : questions) {
             this.questions.put(question.getQuestionId(), question);
-            // System.out.println(question.toString());
+
             this.broadcastQuestionToGroup.accept(this.group.getClientsList(), question);
         }
     }
@@ -59,7 +65,14 @@ public class Survey {
 
     public void endSurvey() {
         this.status = ESurveyStatus.ENDED;
+
+        this.broadcastMessage("The survey is ended");
+
         this.group.clear();
+    }
+
+    private void broadcastMessage(String msg) {
+        this.broadcastMessageToGroup.accept(this.group.getClientsList(), msg);
     }
 
     public void preSurvey() {
