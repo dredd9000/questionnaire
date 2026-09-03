@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -15,15 +17,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.questionnaire.Globals;
 import com.questionnaire.UI.enums.PollStatus;
+import com.questionnaire.UI.model.RowValueData;
 import com.questionnaire.core.TelegramCom;
+import com.questionnaire.core.model.Answer;
 import com.questionnaire.core.model.Client;
 
 public class PollStatsPanel extends JPanel {
+    private final int TABLE_COL_ANSWERS_IDX = 1;
+    private final int TABLE_COL_STATUS_IDX = 2;
+
     private final TelegramCom telegramCom;
     private final RightSidePanel rightSidePanel;
     private final CreatePollPanel createPollPanel;
@@ -34,10 +42,14 @@ public class PollStatsPanel extends JPanel {
     private JTable membersTable;
     private JButton finishPollBtn;
 
+    private final Map<Long, RowValueData> clientRowMap;
+
     public PollStatsPanel(TelegramCom telegramCom, RightSidePanel rightSidePanel, CreatePollPanel createPollPanel) {
         this.telegramCom = telegramCom;
         this.rightSidePanel = rightSidePanel;
         this.createPollPanel = createPollPanel;
+
+        this.clientRowMap = new ConcurrentHashMap<>();
 
         this.initUI();
 
@@ -48,6 +60,8 @@ public class PollStatsPanel extends JPanel {
                 onPanelDisplayed();
             }
         });
+
+        this.updateAnswerStatusThread();
     }
 
     private void initUI() {
@@ -139,11 +153,17 @@ public class PollStatsPanel extends JPanel {
         if (tableModel != null) {
             tableModel.setRowCount(0);
         }
+
         if (statusLabel != null) {
             statusLabel.setText("Status: LIVE SURVEY IN PROGRESS");
         }
+
         if (totalParticipantsLabel != null) {
             totalParticipantsLabel.setText("Total Target Members: 0");
+        }
+
+        if (this.clientRowMap != null) {
+            this.clientRowMap.clear();
         }
     }
 
@@ -160,12 +180,17 @@ public class PollStatsPanel extends JPanel {
 
         totalParticipantsLabel.setText("Total Target Members: " + activeGroup.size());
 
+        int rowIdx = 0;
         for (Client client : activeGroup) {
+            this.clientRowMap.put(client.getClientId(), new RowValueData(rowIdx));
+
             tableModel.addRow(new Object[] {
                     client.getFullName(),
                     "0/" + this.telegramCom.getSurvey().getQuestions().size(),
                     PollStatus.PENDING
             });
+
+            rowIdx++;
         }
     }
 
@@ -179,5 +204,61 @@ public class PollStatsPanel extends JPanel {
 
         // Return back to Create Poll view
         this.rightSidePanel.showPanel(RightSidePanel.CARD_CREATE_POLL);
+    }
+
+    private void updateAnswerStatusThread() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Answer answer = this.telegramCom.getSurvey().getNewAnswer().take();
+
+                    RowValueData rowValueData = this.clientRowMap.get(answer.getClientId());
+
+                    if (rowValueData == null) {
+                        continue;
+                    }
+
+                    rowValueData.incAnsweredCount();
+
+                    this.updateClientProgress(rowValueData);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        })
+                .start();
+    }
+
+    private void updateClientProgress(RowValueData rowValueData) {
+        SwingUtilities.invokeLater(() -> {
+            if (this.telegramCom == null
+                    || this.telegramCom.getSurvey() == null
+                    || !this.telegramCom.getSurvey().isSurveyStarted()
+                    || rowValueData == null) {
+                return;
+            }
+
+            int totalQuestions = this.telegramCom.getSurvey().getQuestions().size();
+            int answers = rowValueData.getAnsweredCount();
+            int rowIdx = rowValueData.getRowIdx();
+
+            if (rowIdx < 0 || rowIdx >= this.tableModel.getRowCount()) {
+                return;
+            }
+
+            PollStatus status;
+            if (answers == 0) {
+                status = PollStatus.PENDING;
+            } else if (answers < totalQuestions) {
+                status = PollStatus.IN_PROGRESS;
+            } else {
+                status = PollStatus.COMPLETED;
+            }
+
+            this.tableModel.setValueAt(answers + "/" + totalQuestions, rowIdx, TABLE_COL_ANSWERS_IDX);
+            this.tableModel.setValueAt(status.getLabel(), rowIdx, TABLE_COL_STATUS_IDX);
+
+        });
     }
 }

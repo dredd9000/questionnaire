@@ -13,4 +13,8 @@ public class Answer {
         this.question = question;
         this.answer = answer;
     }
+
+    public long getClientId() {
+        return this.client.getClientId();
+    }
 }
