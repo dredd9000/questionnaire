@@ -8,6 +8,11 @@ public class AnswerResult {
     private int votes;
     private double percentage;
 
+    public AnswerResult(String answer) {
+        this.answer = answer;
+        this.setStats(0, 0);
+    }
+
     public AnswerResult(String answer, int votes, int total) {
         this.answer = answer;
         this.setStats(votes, total);

@@ -22,6 +22,7 @@ import com.questionnaire.UI.helpers.QuestionBlock;
 import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.TelegramCom;
 import com.questionnaire.core.model.Question;
+import com.questionnaire.core.model.QuestionResult;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -108,9 +109,11 @@ public class CreatePollPanel extends JPanel {
         aiRadio.addActionListener(modeListener);
 
         generateAiBtn.addActionListener(e -> {
-            if (onAiGenerateCallback != null && !aiTopicField.getText().trim().isEmpty()) {
-                onAiGenerateCallback.accept(aiTopicField.getText().trim());
-            }
+            // if (onAiGenerateCallback != null && !aiTopicField.getText().trim().isEmpty())
+            // {
+            // onAiGenerateCallback.accept(aiTopicField.getText().trim());
+            // }
+            this.handleGenerateAiBtnClick();
         });
 
         gbc.gridx = 0;
@@ -130,6 +133,31 @@ public class CreatePollPanel extends JPanel {
         panel.add(generateAiBtn, gbc);
 
         return panel;
+    }
+
+    private void handleGenerateAiBtnClick() {
+        String request = aiTopicField.getText().trim();
+
+        if (request == null || request.isBlank()) {
+            Globals.toast.error("Please write anything in text field so we can ask ChatGPT");
+            return;
+        }
+
+        List<QuestionResult> response = Globals.chatGptCom.getQuestions(request);
+
+        if (response == null) {
+            Globals.toast.error("something went wrong with chatgpt interaction");
+            return;
+        }
+
+        int questionsDelta = response.size() - this.questionBlocks.size();
+
+        if (questionsDelta > 0) {
+            for (int i = 0; i < questionsDelta; i++) {
+                this.addQuestionBlock();
+            }
+        }
+
     }
 
     // --- SECTION 2: Questions Scroll Area ---
