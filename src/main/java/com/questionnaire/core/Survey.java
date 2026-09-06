@@ -61,6 +61,7 @@ public class Survey {
     }
 
     private void createGroup() {
+        this.group.clear();
         this.group.copyFromClientManager(this.clientManager);
     }
 
@@ -68,8 +69,6 @@ public class Survey {
         this.status = ESurveyStatus.ENDED;
 
         this.broadcastMessage("The survey is ended");
-
-        this.group.clear();
     }
 
     private void broadcastMessage(String msg) {
@@ -146,6 +145,8 @@ public class Survey {
         List<QuestionResult> results = new ArrayList<>();
 
         Collection<Client> participants = this.group.getClientsList();
+
+        System.out.println(participants.size());
 
         for (Question question : this.questions.values()) {
             results.add(question.getResults(participants));

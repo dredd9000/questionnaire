@@ -14,6 +14,11 @@ public class AnswerResult {
     }
 
     public void setStats(int votes, int total) {
+        if (total == 0) {
+            this.percentage = 0.0;
+            return;
+        }
+
         this.votes = votes;
         this.percentage = (double) votes / total * 100;
     }

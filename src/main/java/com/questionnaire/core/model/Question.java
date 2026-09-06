@@ -74,13 +74,14 @@ public class Question {
 
         int total = group.size();
 
-        Map<Integer, Long> answersCountMap = this.answeredBy.entrySet().stream()
-                .collect(Collectors.groupingBy(e -> e.getValue(), Collectors.counting()));
+        // Map each answer index (0, 1, 2...) to its vote count
+        Map<Integer, Long> answersCountMap = this.answeredBy.values().stream()
+                .collect(Collectors.groupingBy(ansIdx -> ansIdx, Collectors.counting()));
 
-        for (Map.Entry<Integer, Long> entry : answersCountMap.entrySet()) {
-            AnswerResult answerResult = new AnswerResult(this.answers.get(entry.getKey()),
-                    entry.getValue().intValue(),
-                    total);
+        // Iterate over ALL defined answers, not just answered ones
+        for (int i = 0; i < this.answers.size(); i++) {
+            int votes = answersCountMap.getOrDefault(i, 0L).intValue();
+            AnswerResult answerResult = new AnswerResult(this.answers.get(i), votes, total);
             results.addResult(answerResult);
         }
 

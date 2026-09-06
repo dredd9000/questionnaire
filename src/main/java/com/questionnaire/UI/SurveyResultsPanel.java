@@ -33,7 +33,7 @@ public class SurveyResultsPanel extends JPanel {
         headerLabel.setBorder(new EmptyBorder(15, 15, 15, 15));
         add(headerLabel, BorderLayout.NORTH);
 
-        // Container for questions (Scrollable)
+        // Container for question cards
         containerPanel = new JPanel();
         containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS));
         containerPanel.setBackground(new Color(245, 247, 250));
@@ -44,6 +44,23 @@ public class SurveyResultsPanel extends JPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(scrollPane, BorderLayout.CENTER);
 
+        // Footer with "Start New Survey" Button
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(new Color(245, 247, 250));
+        bottomPanel.setBorder(new EmptyBorder(10, 15, 15, 15));
+
+        JButton startNewSurveyButton = new JButton("Start New Survey");
+        startNewSurveyButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        startNewSurveyButton.setBackground(new Color(13, 110, 253));
+        startNewSurveyButton.setForeground(Color.WHITE);
+        startNewSurveyButton.setFocusPainted(false);
+        startNewSurveyButton.setPreferredSize(new Dimension(180, 40));
+
+        startNewSurveyButton.addActionListener(e -> onStartNewSurveyClicked());
+        bottomPanel.add(startNewSurveyButton);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
@@ -52,21 +69,31 @@ public class SurveyResultsPanel extends JPanel {
         });
     }
 
-    private void onPanelDisplayed() {
-        this.displayResults(this.telegramCom.getSurvey().getResults());
+    private void onStartNewSurveyClicked() {
+        if (this.telegramCom != null && this.telegramCom.getSurvey() != null) {
+            // Set status back to PRE so a new survey can be set up
+            this.telegramCom.getSurvey().preSurvey();
+        }
+
+        // Navigate back to the setup view using RightSidePanel
+        if (this.rightSidePanel != null) {
+            // Adjust card name ("SURVEY_SETUP" / "CREATE_SURVEY") to match your
+            // RightSidePanel setup
+            this.rightSidePanel.showPanel(RightSidePanel.CARD_CREATE_POLL);
+        }
     }
 
-    /**
-     * Display survey results.
-     * Sorts answers by votes descending and populates the UI.
-     * 
-     * @param results List of QuestionResult from Survey.getResults()
-     */
-    private void displayResults(List<QuestionResult> results) {
+    private void onPanelDisplayed() {
+        if (this.telegramCom != null && this.telegramCom.getSurvey() != null) {
+            this.displayResults(this.telegramCom.getSurvey().getResults());
+        }
+    }
+
+    public void displayResults(List<QuestionResult> results) {
         containerPanel.removeAll();
 
         if (results == null || results.isEmpty()) {
-            JLabel emptyLabel = new JLabel("No results available for this survey.");
+            JLabel emptyLabel = new JLabel("No survey results to display.");
             emptyLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
             emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             containerPanel.add(emptyLabel);
@@ -78,7 +105,6 @@ public class SurveyResultsPanel extends JPanel {
                 List<AnswerResult> sortedAnswers = new ArrayList<>(qResult.getResults());
                 sortedAnswers.sort(Comparator.comparingInt(AnswerResult::getVotes).reversed());
 
-                // Add Question Card to layout
                 containerPanel.add(createQuestionCard(i + 1, qResult.getQuestion(), sortedAnswers));
                 containerPanel.add(Box.createRigidArea(new Dimension(0, 15)));
             }
@@ -96,19 +122,17 @@ public class SurveyResultsPanel extends JPanel {
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1),
                 new EmptyBorder(15, 15, 15, 15)));
 
-        // Question Title
         JLabel titleLabel = new JLabel("Q" + qNum + ". " + questionText);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         titleLabel.setForeground(new Color(49, 53, 59));
         card.add(titleLabel, BorderLayout.NORTH);
 
-        // Answers List Panel
         JPanel answersPanel = new JPanel();
         answersPanel.setLayout(new BoxLayout(answersPanel, BoxLayout.Y_AXIS));
         answersPanel.setOpaque(false);
 
         if (answers == null || answers.isEmpty()) {
-            JLabel noVotesLabel = new JLabel("No responses recorded for this question.");
+            JLabel noVotesLabel = new JLabel("No choices available.");
             noVotesLabel.setFont(new Font("SansSerif", Font.ITALIC, 12));
             noVotesLabel.setForeground(Color.GRAY);
             answersPanel.add(noVotesLabel);
@@ -127,22 +151,24 @@ public class SurveyResultsPanel extends JPanel {
         JPanel row = new JPanel(new BorderLayout(10, 0));
         row.setOpaque(false);
 
-        // Left: Answer Text
         JLabel answerTextLabel = new JLabel(answerResult.getAnswer());
         answerTextLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         answerTextLabel.setPreferredSize(new Dimension(220, 25));
 
-        // Center: Progress Bar
+        double pct = answerResult.getPercentage();
+        if (Double.isNaN(pct) || Double.isInfinite(pct)) {
+            pct = 0.0;
+        }
+
         JProgressBar progressBar = new JProgressBar(0, 100);
-        int percentage = (int) Math.round(answerResult.getPercentage());
-        progressBar.setValue(percentage);
+        int percentageInt = (int) Math.round(pct);
+        progressBar.setValue(percentageInt);
         progressBar.setStringPainted(true);
-        progressBar.setString(String.format("%.1f%%", answerResult.getPercentage()));
+        progressBar.setString(String.format("%.1f%%", pct));
         progressBar.setFont(new Font("SansSerif", Font.BOLD, 11));
         progressBar.setForeground(new Color(13, 110, 253));
         progressBar.setPreferredSize(new Dimension(200, 20));
 
-        // Right: Vote Count
         JLabel votesLabel = new JLabel(answerResult.getVotes() + " vote(s)", SwingConstants.RIGHT);
         votesLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         votesLabel.setForeground(Color.GRAY);
