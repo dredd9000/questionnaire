@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.questionnaire.core.CoreConstants;
 import com.questionnaire.core.model.Question;
+import com.questionnaire.core.model.QuestionResult;
 
 public class QuestionBlock extends JPanel {
     private final JLabel titleLabel;
@@ -141,4 +142,23 @@ public class QuestionBlock extends JPanel {
         return new Question(this.questionField.getText(), options);
     }
 
+    public void putQuestionWithAnswers(QuestionResult questionResult) {
+        if (questionResult == null) {
+            return;
+        }
+
+        int delta = questionResult.getResults().size() - this.optionFields.size();
+
+        if (delta > 0) {
+            for (int i = 0; i < delta; i++) {
+                this.addOptionField();
+            }
+        }
+
+        this.questionField.setText(questionResult.getQuestion());
+
+        for (int i = 0; i < questionResult.getResults().size(); i++) {
+            this.optionFields.get(i).setText(questionResult.getResults().get(i).getAnswer());
+        }
+    }
 }

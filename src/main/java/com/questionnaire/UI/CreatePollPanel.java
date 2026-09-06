@@ -158,6 +158,9 @@ public class CreatePollPanel extends JPanel {
             }
         }
 
+        for (int i = 0; i < response.size(); i++) {
+            this.questionBlocks.get(i).putQuestionWithAnswers(response.get(i));
+        }
     }
 
     // --- SECTION 2: Questions Scroll Area ---

@@ -23,7 +23,7 @@ public class ChatGptCom {
 
         StringBuffer sb = new StringBuffer();
 
-        sb.append("i want to create survey with few questions about the next topic:");
+        sb.append("i want to create poll with few questions about the next topic:");
 
         sb.append(requestQuestion);
 
