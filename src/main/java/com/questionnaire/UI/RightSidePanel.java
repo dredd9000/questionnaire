@@ -12,6 +12,7 @@ public class RightSidePanel extends JPanel {
     public static final String CARD_CREATE_POLL = "CREATE_POLL";
     public static final String CARD_COUNTDOWN = "COUNTDOWN";
     public static final String CARD_STATS = "STATS";
+    public static final String CARD_RESULTS = "RESULTS";
 
     private final CardLayout cardLayout;
     private final JPanel rightPanelContainer;
@@ -22,6 +23,7 @@ public class RightSidePanel extends JPanel {
     private CreatePollPanel createPollPanel;
     private CountdownPanel countdownPanel; // Optional
     private PollStatsPanel pollStatsPanel;
+    private SurveyResultsPanel surveyResultsPanel;
 
     public RightSidePanel(TelegramCom telegramCom) {
         this.telegramCom = telegramCom;
@@ -36,6 +38,7 @@ public class RightSidePanel extends JPanel {
         rightPanelContainer.add(createPollPanel, CARD_CREATE_POLL);
         rightPanelContainer.add(countdownPanel, CARD_COUNTDOWN);
         rightPanelContainer.add(pollStatsPanel, CARD_STATS);
+        rightPanelContainer.add(surveyResultsPanel, CARD_RESULTS);
 
         setLayout(new BorderLayout());
         add(this.rightPanelContainer, BorderLayout.CENTER);
@@ -48,6 +51,7 @@ public class RightSidePanel extends JPanel {
         this.createPollPanel = new CreatePollPanel(this.telegramCom, this);
         this.countdownPanel = new CountdownPanel(this, this.createPollPanel);
         this.pollStatsPanel = new PollStatsPanel(this.telegramCom, this, this.createPollPanel);
+        this.surveyResultsPanel = new SurveyResultsPanel(this.telegramCom, this);
     }
 
     public void showPanel(String cardKey) {

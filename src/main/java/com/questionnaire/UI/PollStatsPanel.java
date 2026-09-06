@@ -264,6 +264,10 @@ public class PollStatsPanel extends JPanel {
             completedCountLabel.setText("Completed: " + completed);
         if (pendingCountLabel != null)
             pendingCountLabel.setText("Pending: " + pending);
+
+        if (total != 0 && completed == total) {
+            this.endPollAndReset();
+        }
     }
 
     private void resetRemaining() {
@@ -316,8 +320,7 @@ public class PollStatsPanel extends JPanel {
             telegramCom.getSurvey().endSurvey(); // Clears survey group map and changes status
         }
 
-        // Return back to Create Poll view
-        this.rightSidePanel.showPanel(RightSidePanel.CARD_CREATE_POLL);
+        this.rightSidePanel.showPanel(RightSidePanel.CARD_RESULTS);
     }
 
     private void updateAnswerStatusThread() {
