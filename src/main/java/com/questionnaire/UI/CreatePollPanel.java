@@ -54,8 +54,6 @@ public class CreatePollPanel extends JPanel {
     private JButton launchPollBtn;
     private JLabel statusBannerLabel;
 
-    private java.util.function.Consumer<String> onAiGenerateCallback;
-
     public CreatePollPanel(TelegramCom telegramCom, RightSidePanel rightSidePanel) {
         this.telegramCom = telegramCom;
         this.rightSidePanel = rightSidePanel;
@@ -109,10 +107,6 @@ public class CreatePollPanel extends JPanel {
         aiRadio.addActionListener(modeListener);
 
         generateAiBtn.addActionListener(e -> {
-            // if (onAiGenerateCallback != null && !aiTopicField.getText().trim().isEmpty())
-            // {
-            // onAiGenerateCallback.accept(aiTopicField.getText().trim());
-            // }
             this.handleGenerateAiBtnClick();
         });
 
