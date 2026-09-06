@@ -140,7 +140,6 @@ public class CreatePollPanel extends JPanel {
         List<QuestionResult> response = Globals.chatGptCom.getQuestions(request);
 
         if (response == null) {
-            Globals.toast.error("something went wrong with chatgpt interaction");
             return;
         }
 

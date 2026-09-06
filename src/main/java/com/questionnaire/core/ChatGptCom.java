@@ -3,6 +3,7 @@ package com.questionnaire.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.questionnaire.Globals;
 import com.questionnaire.core.model.AnswerResult;
 import com.questionnaire.core.model.QuestionResult;
 import com.questionnaire.core.utils.ChatGpt;
@@ -54,6 +55,8 @@ public class ChatGptCom {
         if (CoreConstants.MIN_QUESTIONS > questionsWithAnswers.length
                 || questionsWithAnswers.length > CoreConstants.MAX_QUESTIONS) {
             System.out.println("1: " + questionsWithAnswers.length);
+            Globals.toast.error("chatGPT did not generate questions between " + CoreConstants.MIN_QUESTIONS + " and "
+                    + CoreConstants.MAX_QUESTIONS + ", try to clarify or ask another question");
             return null;
         }
 
@@ -63,7 +66,8 @@ public class ChatGptCom {
             String[] arr = questionWithAnswers.split(CoreConstants.ANSWER_DELIMITER);
 
             if (CoreConstants.MIN_ANSWERS + 1 > arr.length || arr.length > CoreConstants.MAX_ANSWERS + 1) {
-                System.out.println("2");
+                Globals.toast.error("chatGPT did not generate answers between " + CoreConstants.MIN_QUESTIONS + " and "
+                        + CoreConstants.MAX_QUESTIONS + " for some questions, try to clarify or ask another question");
                 return null;
             }
 
