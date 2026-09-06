@@ -41,7 +41,7 @@ public class ChatGptCom {
 
         // String response = this.chatGpt.getResponse(sb.toString());
         // TODO: bring it back, for chatgpt apis calls
-        String response = "What is Bon Jovi's most famous song?:Livin' on a Prayer:You Give Love a Bad Name:It's My Life;Which decade did Bon Jovi form?:1970s:1980s:1990s:2000s;Who is the lead singer of Bon Jovi?:Jon Bon Jovi:Richie Sambora:David Bryan:Phil X";
+        String response = "Which Bon Jovi song is your favorite?:Livin' on a Prayer:It's My Life:You Give Love a Bad Name:Wanted Dead or Alive;Which Bon Jovi album do you like most?:Slippery When Wet:New Jersey:Keep the Faith:Crush;When did you first discover Bon Jovi?:1980s:1990s:2000s:2010s or later";
 
         if (response == null) {
             return null;
