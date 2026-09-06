@@ -26,7 +26,7 @@ public class ChatGptCom {
 
         sb.append("i want to create poll with few questions about the next topic:");
 
-        sb.append(requestQuestion);
+        sb.append(" " + requestQuestion);
 
         sb.append(". please struck the question with answers like so question" + CoreConstants.ANSWER_DELIMITER
                 + "answer" + CoreConstants.ANSWER_DELIMITER + "answer..." + CoreConstants.QUESTION_DELIMITER);
@@ -39,9 +39,13 @@ public class ChatGptCom {
         System.out.println("request:");
         System.out.println(sb.toString());
 
-        // String response = this.chatGpt.getResponse(sb.toString());
+        String response = this.chatGpt.getResponse(sb.toString());
         // TODO: bring it back, for chatgpt apis calls
-        String response = "Which Bon Jovi song is your favorite?:Livin' on a Prayer:It's My Life:You Give Love a Bad Name:Wanted Dead or Alive;Which Bon Jovi album do you like most?:Slippery When Wet:New Jersey:Keep the Faith:Crush;When did you first discover Bon Jovi?:1980s:1990s:2000s:2010s or later";
+        // String response = "Which Bon Jovi song is your favorite?:Livin' on a
+        // Prayer:It's My Life:You Give Love a Bad Name:Wanted Dead or Alive;Which Bon
+        // Jovi album do you like most?:Slippery When Wet:New Jersey:Keep the
+        // Faith:Crush;When did you first discover Bon Jovi?:1980s:1990s:2000s:2010s or
+        // later";
 
         if (response == null) {
             return null;
