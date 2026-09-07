@@ -36,23 +36,13 @@ public class ChatGptCom {
 
         sb.append(" your response must be at that exact structure because i need to parse it on my end.");
 
-        System.out.println("request:");
-        System.out.println(sb.toString());
+        Globals.toast.info("Sending request to chatgpt");
 
         String response = this.chatGpt.getResponse(sb.toString());
-        // TODO: bring it back, for chatgpt apis calls
-        // String response = "Which Bon Jovi song is your favorite?:Livin' on a
-        // Prayer:It's My Life:You Give Love a Bad Name:Wanted Dead or Alive;Which Bon
-        // Jovi album do you like most?:Slippery When Wet:New Jersey:Keep the
-        // Faith:Crush;When did you first discover Bon Jovi?:1980s:1990s:2000s:2010s or
-        // later";
 
         if (response == null) {
             return null;
         }
-
-        System.out.println("response:");
-        System.out.println(response);
 
         String[] questionsWithAnswers = response.split(CoreConstants.QUESTION_DELIMITER);
 
