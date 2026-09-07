@@ -21,15 +21,30 @@ public class QuestionBlock extends JPanel {
     private final JLabel titleLabel;
     private final JTextField questionField;
     private final JPanel optionsPanel;
-    private final List<JTextField> optionFields;
+    private final List<OptionRow> optionRows;
     private final JButton addOptionBtn;
     private final JButton removeQuestionBtn;
+
+    // Helper class to manage each option row and its components
+    private static class OptionRow {
+        JPanel panel;
+        JLabel label;
+        JTextField field;
+        JButton removeBtn;
+
+        OptionRow(JPanel panel, JLabel label, JTextField field, JButton removeBtn) {
+            this.panel = panel;
+            this.label = label;
+            this.field = field;
+            this.removeBtn = removeBtn;
+        }
+    }
 
     public QuestionBlock(int number, Runnable onDelete) {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createTitledBorder("Question " + number));
 
-        optionFields = new ArrayList<>();
+        optionRows = new ArrayList<>();
         titleLabel = new JLabel("Question Wording:");
 
         questionField = new JTextField();
@@ -54,7 +69,7 @@ public class QuestionBlock extends JPanel {
         bottom.add(addOptionBtn);
         add(bottom, BorderLayout.SOUTH);
 
-        // Default: 2 minimum options required
+        // Default: minimum options required
         for (int i = 0; i < CoreConstants.MIN_ANSWERS; i++) {
             addOptionField();
         }
@@ -69,23 +84,57 @@ public class QuestionBlock extends JPanel {
     }
 
     private void addOptionField() {
-        if (optionFields.size() >= CoreConstants.MAX_ANSWERS)
+        if (optionRows.size() >= CoreConstants.MAX_ANSWERS)
             return;
 
-        int optNum = optionFields.size() + 1;
+        int optNum = optionRows.size() + 1;
         JPanel optRow = new JPanel(new BorderLayout(5, 5));
         JLabel label = new JLabel("Choice " + optNum + ": ");
         JTextField optField = new JTextField(20);
 
-        optionFields.add(optField);
+        JButton removeOptBtn = new JButton("X");
+        removeOptBtn.setToolTipText("Remove choice");
+
+        OptionRow rowObj = new OptionRow(optRow, label, optField, removeOptBtn);
+        removeOptBtn.addActionListener(e -> removeOptionField(rowObj));
+
         optRow.add(label, BorderLayout.WEST);
         optRow.add(optField, BorderLayout.CENTER);
+        optRow.add(removeOptBtn, BorderLayout.EAST);
 
+        optionRows.add(rowObj);
         optionsPanel.add(optRow);
-        addOptionBtn.setEnabled(optionFields.size() < CoreConstants.MAX_ANSWERS);
+
+        updateOptionStates();
 
         revalidate();
         repaint();
+    }
+
+    private void removeOptionField(OptionRow row) {
+        if (optionRows.size() <= CoreConstants.MIN_ANSWERS) {
+            return;
+        }
+
+        optionRows.remove(row);
+        optionsPanel.remove(row.panel);
+
+        updateOptionStates();
+
+        revalidate();
+        repaint();
+    }
+
+    private void updateOptionStates() {
+        boolean canRemove = optionRows.size() > CoreConstants.MIN_ANSWERS;
+
+        for (int i = 0; i < optionRows.size(); i++) {
+            OptionRow r = optionRows.get(i);
+            r.label.setText("Choice " + (i + 1) + ": ");
+            r.removeBtn.setEnabled(canRemove);
+        }
+
+        addOptionBtn.setEnabled(optionRows.size() < CoreConstants.MAX_ANSWERS);
     }
 
     public boolean validateFields() {
@@ -107,7 +156,7 @@ public class QuestionBlock extends JPanel {
         this.questionField.repaint();
 
         // 2. Validate Option Count Range
-        int numberOfOptions = this.optionFields.size();
+        int numberOfOptions = this.optionRows.size();
         if (!InputValidations.isInRange(numberOfOptions,
                 CoreConstants.MIN_ANSWERS,
                 CoreConstants.MAX_ANSWERS)) {
@@ -115,7 +164,8 @@ public class QuestionBlock extends JPanel {
         }
 
         // 3. Validate Each Choice/Answer Field
-        for (JTextField jTextField : this.optionFields) {
+        for (OptionRow row : this.optionRows) {
+            JTextField jTextField = row.field;
             if (!InputValidations.isTextValid(jTextField.getText(),
                     CoreConstants.MIN_CHARS_IN_ANSWER,
                     CoreConstants.MAX_CHARS_IN_ANSWER)) {
@@ -123,7 +173,7 @@ public class QuestionBlock extends JPanel {
                 jTextField.setToolTipText("Choice length must be between "
                         + CoreConstants.MIN_CHARS_IN_ANSWER + " and "
                         + CoreConstants.MAX_CHARS_IN_ANSWER + " characters.");
-                isValid = false; // Mark invalid, but KEEP LOOPING so remaining invalid fields highlight
+                isValid = false;
             } else {
                 jTextField.putClientProperty(FlatClientProperties.OUTLINE, null);
                 jTextField.setToolTipText(null);
@@ -135,8 +185,8 @@ public class QuestionBlock extends JPanel {
     }
 
     public Question createQuestionObject() {
-        List<String> options = this.optionFields.stream()
-                .map(tf -> tf.getText())
+        List<String> options = this.optionRows.stream()
+                .map(r -> r.field.getText())
                 .toList();
 
         return new Question(this.questionField.getText(), options);
@@ -147,7 +197,7 @@ public class QuestionBlock extends JPanel {
             return;
         }
 
-        int delta = questionResult.getResults().size() - this.optionFields.size();
+        int delta = questionResult.getResults().size() - this.optionRows.size();
 
         if (delta > 0) {
             for (int i = 0; i < delta; i++) {
@@ -158,7 +208,7 @@ public class QuestionBlock extends JPanel {
         this.questionField.setText(questionResult.getQuestion());
 
         for (int i = 0; i < questionResult.getResults().size(); i++) {
-            this.optionFields.get(i).setText(questionResult.getResults().get(i).getAnswer());
+            this.optionRows.get(i).field.setText(questionResult.getResults().get(i).getAnswer());
         }
     }
 }
