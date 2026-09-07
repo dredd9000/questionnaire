@@ -15,6 +15,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 
 import com.questionnaire.Globals;
 import com.questionnaire.UI.helpers.InputValidations;
@@ -129,6 +130,34 @@ public class CreatePollPanel extends JPanel {
         return panel;
     }
 
+    // private void handleGenerateAiBtnClick() {
+    // String request = aiTopicField.getText().trim();
+
+    // if (request == null || request.isBlank()) {
+    // Globals.toast.error("Please write anything in text field so we can ask
+    // ChatGPT");
+    // return;
+    // }
+
+    // List<QuestionResult> response = Globals.chatGptCom.getQuestions(request);
+
+    // if (response == null) {
+    // return;
+    // }
+
+    // int questionsDelta = response.size() - this.questionBlocks.size();
+
+    // if (questionsDelta > 0) {
+    // for (int i = 0; i < questionsDelta; i++) {
+    // this.addQuestionBlock();
+    // }
+    // }
+
+    // for (int i = 0; i < response.size(); i++) {
+    // this.questionBlocks.get(i).putQuestionWithAnswers(response.get(i));
+    // }
+    // }
+
     private void handleGenerateAiBtnClick() {
         String request = aiTopicField.getText().trim();
 
@@ -137,23 +166,54 @@ public class CreatePollPanel extends JPanel {
             return;
         }
 
-        List<QuestionResult> response = Globals.chatGptCom.getQuestions(request);
+        // Disable button or show loading state
+        aiTopicField.setEnabled(false);
 
-        if (response == null) {
-            return;
-        }
-
-        int questionsDelta = response.size() - this.questionBlocks.size();
-
-        if (questionsDelta > 0) {
-            for (int i = 0; i < questionsDelta; i++) {
-                this.addQuestionBlock();
+        // Run network call on background thread
+        SwingWorker<List<QuestionResult>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected List<QuestionResult> doInBackground() {
+                // This runs on a separate thread, keeping UI smooth
+                return Globals.chatGptCom.getQuestions(request);
             }
-        }
 
-        for (int i = 0; i < response.size(); i++) {
-            this.questionBlocks.get(i).putQuestionWithAnswers(response.get(i));
-        }
+            @Override
+            protected void done() {
+                // This runs back on Swing's Event Dispatch Thread
+                aiTopicField.setEnabled(true);
+
+                try {
+                    List<QuestionResult> response = get();
+
+                    if (response == null || response.isEmpty()) {
+                        return;
+                    }
+
+                    // If response size is smaller than existing blocks, clean up extra blocks
+                    if (response.size() < questionBlocks.size()) {
+                        while (questionBlocks.size() > response.size()) {
+                            removeQuestionBlock(questionBlocks.size() - 1);
+                        }
+                    } else {
+                        int questionsDelta = response.size() - questionBlocks.size();
+                        for (int i = 0; i < questionsDelta; i++) {
+                            addQuestionBlock();
+                        }
+                    }
+
+                    // Populate questions into blocks
+                    for (int i = 0; i < response.size(); i++) {
+                        questionBlocks.get(i).putQuestionWithAnswers(response.get(i));
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Globals.toast.error("An error occurred while fetching AI questions.");
+                }
+            }
+        };
+
+        worker.execute();
     }
 
     // --- SECTION 2: Questions Scroll Area ---
