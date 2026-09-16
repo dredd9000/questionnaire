@@ -1,5 +1,6 @@
 package com.questionnaire.UI;
 
+import com.questionnaire.Globals;
 import com.questionnaire.core.TelegramCom;
 import com.questionnaire.core.model.AnswerResult;
 import com.questionnaire.core.model.QuestionResult;
@@ -85,6 +86,7 @@ public class SurveyResultsPanel extends JPanel {
 
     private void onPanelDisplayed() {
         if (this.telegramCom != null && this.telegramCom.getSurvey() != null) {
+            Globals.toast.info("The poll ended and here is the results");
             this.displayResults(this.telegramCom.getSurvey().getResults());
         }
     }
