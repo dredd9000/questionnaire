@@ -58,6 +58,22 @@ chatgpt.url=https://shaitest-production-3066.up.railway.app/api-request
 
 > ⚠️ **Security Note:** I Never commit `config.properties`, Please add this file so the project will work
 
+### Testing helper
+
+When you want to test the project you can change the core
+you can change the following constance for testing with 1 client 
+and faster time delays, why wait 5 minutes when you can wait 1 
+
+```
+public static final int MIN_CLIENTS = 1;
+...
+public static final int MAX_SURVEY_TIME_SEC = 1 * 60;
+public static final int NOTIFY_AFTER_SEC = 30;
+```
+The file located at:
+```
+src/main/com/questionnaire/core/CoreConstants.java
+```
 ---
 
 ## 📋 Features Breakdown
@@ -90,7 +106,7 @@ chatgpt.url=https://shaitest-production-3066.up.railway.app/api-request
 
 ---
 
-## 📁 5. Project structure
+## 📁 Project structure
 
 ```text
 telegram-survey-system/
