@@ -14,7 +14,7 @@ public class CoreConstants {
     public static final int MIN_QUESTIONS = 1;
     public static final int MAX_QUESTIONS = 3;
 
-    public static final int MIN_CLIENTS = 1; // ! TODO: bring back to 3
+    public static final int MIN_CLIENTS = 3;
 
     public static final String QUESTION_DELIMITER = ";";
     public static final String ANSWER_DELIMITER = ":";
@@ -38,6 +38,6 @@ public class CoreConstants {
     public static final int MAX_CHARS_IN_ANSWER = 50;
 
     /* survey timers limits */
-    public static final int MAX_SURVEY_TIME_SEC = 1 * 60; // TODO: bring back to 5 * 60
-    public static final int NOTIFY_AFTER_SEC = 30; // TODO: bring back to 3 * 60
+    public static final int MAX_SURVEY_TIME_SEC = 5 * 60;
+    public static final int NOTIFY_AFTER_SEC = 3 * 60;
 }
