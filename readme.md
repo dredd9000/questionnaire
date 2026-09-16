@@ -35,8 +35,8 @@ The system consists of two tightly coupled components:
 
 ### Prerequisites
 
-* **Java Development Kit (JDK):** Version 17 or higher recommended.
-* **Maven** (or Gradle) for dependency management.
+* **Java Development Kit (JDK):** Version 21 or higher recommended.
+* **Maven** for dependency management.
 * **Telegram Bot Token:** Obtained via [@BotFather](https://t.me/BotFather).
 * **OpenAI API Key:** Obtained via [Shai](https://front-2025.onrender.com/).
 
