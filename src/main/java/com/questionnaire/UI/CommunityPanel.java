@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import com.questionnaire.Globals;
 import com.questionnaire.core.TelegramCom;
 import com.questionnaire.core.model.Client;
 
@@ -84,6 +85,7 @@ public class CommunityPanel extends JPanel {
      */
     public void addClientRow(String name, String telegramUsername, String joinedAt) {
         // Swing components MUST be updated on the Event Dispatch Thread (EDT)
+        Globals.toast.success(name + " join to our community");
         SwingUtilities.invokeLater(() -> {
             this.tableModel.addRow(new Object[] { name, telegramUsername, joinedAt });
             this.totalMembersLabel.setText(this.telegramCom.getClientsCount() + "");

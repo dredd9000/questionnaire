@@ -30,6 +30,10 @@ public class Toast {
         this.add(message, ToastType.INFO);
     }
 
+    public void success(String message) {
+        this.add(message, ToastType.SUCCESS);
+    }
+
     public void add(String message, ToastType toastType) {
         this.msgsQueue.add(new ToastMessage(message, toastType));
     }
